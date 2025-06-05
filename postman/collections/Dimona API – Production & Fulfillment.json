@@ -1,0 +1,2079 @@
+{
+	"info": {
+		"_postman_id": "7529bbac-1a95-488e-ab3c-2814ea2a2423",
+		"name": "Dimona API – Production & Fulfillment",
+		"description": "Welcome to the Dimona API — your gateway to fast, high-quality direct-to-garment (DTG) printing across the Americas.\n\nDimona operates the largest on-demand DTG network in Latin America, with facilities in the U.S., Brazil, Mexico, Argentina, and Chile. Whether you're building an eCommerce store, managing a B2B merch program, or scaling global fulfillment — this API gets your orders printed, packed, and shipped with precision.\n\n**Key Features:**\n\n- 📦 Local production, faster delivery\n    \n- 🧵 High-quality DTG printing (no minimums)\n    \n- 🌍 International reach with region-optimized logistics\n    \n\nExplore the endpoints below to submit orders, check inventory, track production events, and manage your fulfillment workflow.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_uid": "111729-7529bbac-1a95-488e-ab3c-2814ea2a2423"
+	},
+	"item": [
+		{
+			"name": "Order",
+			"item": [
+				{
+					"name": "Submit a production order",
+					"id": "a0267456-087c-4cd7-8e77-97b8cfb5d6d0",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{usa-api-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"id\": \"orderReference1234\",\n  \"sample\": true,\n  \"address_to\": {\n    \"address1\": \"1983 Tigertail Blvd\",\n    \"address2\": \"\",\n    \"city\": \"Dania Beach\", \n    \"zip\": \"33004\",\n    \"country\": \"US\",\n    \"region\": \"FL\",\n    \"first_name\": \"John\",\n    \"last_name\": \"Doe\"\n  },\n  \"address_from\": {\n    \"address1\": \"1983 Tigertail Blvd\",\n    \"address2\": \"\",\n    \"city\": \"Dania\",\n    \"zip\": \"33004\",\n    \"country\": \"US\",\n    \"region\": \"FL\",\n    \"company\": \"Tee USA LLC\"\n  },\n  \"shipping\": {\n    \"carrier\": \"USPS\",\n    \"priority\": \"Standard\"\n  },\n  \"items\": [\n    {\n      \"id\": \"gB0NV05e\",\n      \"sku\": \"BLC-3001-BLACK-L\",\n      \"preview_files\": {\n        \"front\": \"https://dimona.s3.us-east-1.amazonaws.com/dimonausa/image_1_mockup.png\"\n      },\n      \"print_files\": {\n        \"front\": \"https://dimona.s3.us-east-1.amazonaws.com/dimonausa/image_1_printfile.png\"\n      },\n      \"quantity\": 1\n    },\n    {\n      \"id\": \"yLA6m0oM\",\n      \"sku\": \"BLC-3001-BLACK-L\",\n      \"preview_files\": {\n        \"front\": \"https://dimona.s3.us-east-1.amazonaws.com/dimonausa/image_2_mockup.png\"\n      },\n      \"print_files\": {\n        \"front\": \"https://dimona.s3.us-east-1.amazonaws.com/dimonausa/image_2_printfile.png\"\n      },\n      \"quantity\": 1\n    }\n  ],\n  \"package_inserts\":[\n    \"https://pdf_to_4x6_insert.pdf\"\n  ],\n  \"packing_slip\":\"https://pdf_to_letter_slip.pdf\"\n}"
+						},
+						"url": {
+							"raw": "{{usa-api-domain}}/api/v2021/orders",
+							"host": [
+								"{{usa-api-domain}}"
+							],
+							"path": [
+								"api",
+								"v2021",
+								"orders"
+							]
+						},
+						"description": "## 🧾 Submit a Production Order\n\nCreate a new DTG production order to be printed, packed, and shipped from one of our regional facilities.\n\nUse this endpoint to send print-ready artwork, shipping details, and item metadata. Orders are automatically validated, assigned to the best facility, and queued for fulfillment.\n\n### 🔧 Required Fields\n\n| Field | Type | Description |\n| --- | --- | --- |\n| `id` | string | Your unique order reference (used for idempotency) |\n| `items` | array | List of products to print, each with a valid SKU and quantity |\n| `print_files` | object | High-res artwork for each print location (PNG, 300 DPI, transparent) |\n| `preview_files` | object | Customer-facing mockups. |\n| `address_to` | object | Shipping details for the end customer |\n| `shipping` | object | Carrier and shipping priority |\n\n### 🪛 Optional Fields\n\n| Field | Type | Description |\n| --- | --- | --- |\n| `sample` | boolean | Mark order as a sample or test (bypasses normal flow) |\n| `reprint` | boolean | Reprint of a previously failed/damaged order |\n| `xqc` | boolean | Enable extra quality control for high-value orders |\n| `package_inserts` | array | Marketing materials (PDFs, 4x6 recommended) |\n| `packing_slip` | string | Custom PDF packing slip (letter size, optional) |\n\n### ⚠️ Best Practices\n\n1. **Check inventory** for each SKU before submitting.\n    \n2. **Use unique order IDs** to avoid duplicates.\n    \n3. **Validate print files** (300 DPI, correct format) to avoid quality issues.\n    \n4. **Include customer contact** for delivery updates and return handling."
+					},
+					"response": [
+						{
+							"id": "d2f33e72-b012-4ee5-9b9a-4a2ddd0dd407",
+							"name": "Success: Order Created",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"id\": \"orderReference\",\n  \"sample\": false,\n  \"reprint\": false,\n  \"xqc\": false,\n  \"address_to\": {\n    \"address1\": \"1983 Tigertail Blvd\",\n    \"address2\": \"\",\n    \"city\": \"Dania Beach\", \n    \"zip\": \"33004\",\n    \"country\": \"US\",\n    \"region\": \"FL\",\n    \"first_name\": \"John\",\n    \"last_name\": \"Doe\"\n  },\n  \"address_from\": {\n    \"address1\": \"1983 Tigertail Blvd\",\n    \"address2\": \"\",\n    \"city\": \"Dania\",\n    \"zip\": \"33004\",\n    \"country\": \"US\",\n    \"region\": \"FL\",\n    \"company\": \"Tee USA LLC\"\n  },\n  \"shipping\": {\n    \"carrier\": \"USPS\",\n    \"priority\": \"Standard\"\n  },\n  \"items\": [\n    {\n      \"id\": \"gB0NV05e\",\n      \"sku\": \"BLC-3001-BLACK-L\",\n      \"preview_files\": {\n        \"front\": \"https://dimona.s3.us-east-1.amazonaws.com/dimonausa/image_1_mockup.png\"\n      },\n      \"print_files\": {\n        \"front\": \"https://dimona.s3.us-east-1.amazonaws.com/dimonausa/image_1_printfile.png\"\n      },\n      \"quantity\": 1\n    },\n    {\n      \"id\": \"yLA6m0oM\",\n      \"sku\": \"BLC-3001-BLACK-L\",\n      \"preview_files\": {\n        \"front\": \"https://dimona.s3.us-east-1.amazonaws.com/dimonausa/image_2_mockup.png\"\n      },\n      \"print_files\": {\n        \"front\": \"https://dimona.s3.us-east-1.amazonaws.com/dimonausa/image_2_printfile.png\"\n      },\n      \"quantity\": 1\n    }\n  ]\n}"
+								},
+								"url": {
+									"raw": "{{usa-api-domain}}/api/v2021/orders",
+									"host": [
+										"{{usa-api-domain}}"
+									],
+									"path": [
+										"api",
+										"v2021",
+										"orders"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Server",
+									"value": "nginx",
+									"uuid": "01fcfa1e-f396-49bf-9585-9a15ceb06292"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json",
+									"uuid": "3db0b0bf-b128-4468-934f-c6d335941b0e"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked",
+									"uuid": "dcff3326-2867-4faa-9e9f-5ba0eee1c229"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive",
+									"uuid": "d782e655-1267-4866-9096-6ffae0a483d2"
+								},
+								{
+									"key": "Vary",
+									"value": "Accept-Encoding",
+									"uuid": "70002d05-81e9-43b6-9c58-2c05ea80a61f"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, private",
+									"uuid": "ccbcfaaf-6c70-4f68-879c-d9502ae535fa"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 28 Sep 2023 17:27:06 GMT",
+									"uuid": "f2d53af3-8915-4e9c-9e29-50d00c25e7ea"
+								},
+								{
+									"key": "X-RateLimit-Limit",
+									"value": "120",
+									"uuid": "644b2eb8-57a8-4851-9ebc-9ab0436045a8"
+								},
+								{
+									"key": "X-RateLimit-Remaining",
+									"value": "119",
+									"uuid": "5110ec11-0d74-48e6-8a03-c2debeafeb20"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*",
+									"uuid": "ca58f511-37fe-4e77-9a96-ea22098d5ab3"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "SAMEORIGIN",
+									"uuid": "d2db30bb-6b19-4f14-83c5-519185a42a98"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "1; mode=block",
+									"uuid": "132bfa38-6c2b-4eb8-9fa2-b9861bd0034e"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff",
+									"uuid": "8f3ec6db-ba04-46d5-9593-50d0cde5d35b"
+								},
+								{
+									"key": "Content-Encoding",
+									"value": "gzip",
+									"uuid": "99ee8a32-b909-4165-a45d-692799f62998"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"success\",\n    \"id\": \"orderReference\",\n    \"reference_id\": \"a4083bf5-8f45-467c-9b98-bd8334928b06\"\n}"
+						},
+						{
+							"id": "b63d72fc-91ee-40c6-89bc-7e7d37c52867",
+							"name": "Error: Duplicated Order",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"id\": \"orderReference\",\n  \"sample\": false,\n  \"reprint\": false,\n  \"xqc\": false,\n  \"address_to\": {\n    \"address1\": \"1983 Tigertail Blvd\",\n    \"address2\": \"\",\n    \"city\": \"Dania Beach\", \n    \"zip\": \"33004\",\n    \"country\": \"US\",\n    \"region\": \"FL\",\n    \"first_name\": \"John\",\n    \"last_name\": \"Doe\"\n  },\n  \"address_from\": {\n    \"address1\": \"1983 Tigertail Blvd\",\n    \"address2\": \"\",\n    \"city\": \"Dania\",\n    \"zip\": \"33004\",\n    \"country\": \"US\",\n    \"region\": \"FL\",\n    \"company\": \"Tee USA LLC\"\n  },\n  \"shipping\": {\n    \"carrier\": \"USPS\",\n    \"priority\": \"Standard\"\n  },\n  \"items\": [\n    {\n      \"id\": \"gB0NV05e\",\n      \"sku\": \"BLC-3001-BLACK-L\",\n      \"preview_files\": {\n        \"front\": \"https://dimona.s3.us-east-1.amazonaws.com/dimonausa/image_1_mockup.png\"\n      },\n      \"print_files\": {\n        \"front\": \"https://dimona.s3.us-east-1.amazonaws.com/dimonausa/image_1_printfile.png\"\n      },\n      \"quantity\": 1\n    },\n    {\n      \"id\": \"yLA6m0oM\",\n      \"sku\": \"BLC-3001-BLACK-L\",\n      \"preview_files\": {\n        \"front\": \"https://dimona.s3.us-east-1.amazonaws.com/dimonausa/image_2_mockup.png\"\n      },\n      \"print_files\": {\n        \"front\": \"https://dimona.s3.us-east-1.amazonaws.com/dimonausa/image_2_printfile.png\"\n      },\n      \"quantity\": 1\n    }\n  ]\n}"
+								},
+								"url": {
+									"raw": "{{usa-api-domain}}/api/v2021/orders",
+									"host": [
+										"{{usa-api-domain}}"
+									],
+									"path": [
+										"api",
+										"v2021",
+										"orders"
+									]
+								}
+							},
+							"status": "Not Modified",
+							"code": 304,
+							"_postman_previewlanguage": "plain",
+							"header": [
+								{
+									"key": "Server",
+									"value": "nginx",
+									"uuid": "40d11c56-3a0f-4813-8218-27b8c7b351d0"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive",
+									"uuid": "7b93682d-08e6-43ee-bb56-8125b22665f1"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, private",
+									"uuid": "4c60d219-1eae-4b39-b4bf-1c7db6b4e7a4"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 28 Sep 2023 17:27:32 GMT",
+									"uuid": "d0a47b71-cb7b-43c3-8ac2-fec28f7855c9"
+								},
+								{
+									"key": "X-RateLimit-Limit",
+									"value": "120",
+									"uuid": "23423775-be7e-4dd4-8096-9d2b2deb8d42"
+								},
+								{
+									"key": "X-RateLimit-Remaining",
+									"value": "118",
+									"uuid": "789fec80-3265-4c79-9799-2a859334e043"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*",
+									"uuid": "113f23a3-583c-437c-af05-a6ef0e94e8c6"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "SAMEORIGIN",
+									"uuid": "cfa541ce-0d31-4f0d-94e3-bab7501c42f9"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "1; mode=block",
+									"uuid": "0c437e58-908f-4f0b-a07f-fdc0c7147e80"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff",
+									"uuid": "1655e0cb-9cd5-4173-be47-08889bd98619"
+								}
+							],
+							"cookie": [],
+							"body": null
+						},
+						{
+							"id": "a39b9ab7-6b69-44a8-896a-2eca7b6b5152",
+							"name": "Error: Unauthenticated",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"id\": \"orderReference\",\n  \"sample\": false,\n  \"reprint\": false,\n  \"xqc\": false,\n  \"address_to\": {\n    \"address1\": \"1983 Tigertail Blvd\",\n    \"address2\": \"\",\n    \"city\": \"Dania Beach\", \n    \"zip\": \"33004\",\n    \"country\": \"US\",\n    \"region\": \"FL\",\n    \"first_name\": \"John\",\n    \"last_name\": \"Doe\"\n  },\n  \"address_from\": {\n    \"address1\": \"1983 Tigertail Blvd\",\n    \"address2\": \"\",\n    \"city\": \"Dania\",\n    \"zip\": \"33004\",\n    \"country\": \"US\",\n    \"region\": \"FL\",\n    \"company\": \"Tee USA LLC\"\n  },\n  \"shipping\": {\n    \"carrier\": \"USPS\",\n    \"priority\": \"Standard\"\n  },\n  \"items\": [\n    {\n      \"id\": \"gB0NV05e\",\n      \"sku\": \"BLC-3001-BLACK-L\",\n      \"preview_files\": {\n        \"front\": \"https://dimona.s3.us-east-1.amazonaws.com/dimonausa/image_1_mockup.png\"\n      },\n      \"print_files\": {\n        \"front\": \"https://dimona.s3.us-east-1.amazonaws.com/dimonausa/image_1_printfile.png\"\n      },\n      \"quantity\": 1\n    },\n    {\n      \"id\": \"yLA6m0oM\",\n      \"sku\": \"BLC-3001-BLACK-L\",\n      \"preview_files\": {\n        \"front\": \"https://dimona.s3.us-east-1.amazonaws.com/dimonausa/image_2_mockup.png\"\n      },\n      \"print_files\": {\n        \"front\": \"https://dimona.s3.us-east-1.amazonaws.com/dimonausa/image_2_printfile.png\"\n      },\n      \"quantity\": 1\n    }\n  ]\n}"
+								},
+								"url": {
+									"raw": "{{usa-api-domain}}/api/v2021/orders",
+									"host": [
+										"{{usa-api-domain}}"
+									],
+									"path": [
+										"api",
+										"v2021",
+										"orders"
+									]
+								}
+							},
+							"status": "Unauthorized",
+							"code": 401,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Server",
+									"value": "nginx",
+									"uuid": "f9e64768-3d7f-4f9e-9f4a-ab55d8c88268"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json",
+									"uuid": "8cbf93f5-df91-4500-afd6-1320a045ac76"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked",
+									"uuid": "b4891983-9577-41b4-b604-4ba67e5e4f15"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive",
+									"uuid": "c24450a4-8dcd-438b-95ee-edcefb7c7568"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, private",
+									"uuid": "b0e8c34e-ae97-42ee-9120-138c0311d7ae"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 28 Sep 2023 17:23:04 GMT",
+									"uuid": "c215c28f-d76e-45ce-9406-1b362b3292af"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*",
+									"uuid": "7e0367e3-164b-46ee-a7e0-8d0fe3ef238e"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"Unauthenticated.\"\n}"
+						},
+						{
+							"id": "92bf7118-41e2-48a1-8cc3-22f96ac3ebb1",
+							"name": "Error: Invalid SKU",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"id\": \"orderReference\",\n  \"sample\": false,\n  \"reprint\": false,\n  \"xqc\": false,\n  \"address_to\": {\n    \"address1\": \"1983 Tigertail Blvd\",\n    \"address2\": \"\",\n    \"city\": \"Dania Beach\", \n    \"zip\": \"33004\",\n    \"country\": \"US\",\n    \"region\": \"FL\",\n    \"first_name\": \"John\",\n    \"last_name\": \"Doe\"\n  },\n  \"address_from\": {\n    \"address1\": \"1983 Tigertail Blvd\",\n    \"address2\": \"\",\n    \"city\": \"Dania\",\n    \"zip\": \"33004\",\n    \"country\": \"US\",\n    \"region\": \"FL\",\n    \"company\": \"Tee USA LLC\"\n  },\n  \"shipping\": {\n    \"carrier\": \"USPS\",\n    \"priority\": \"Standard\"\n  },\n  \"items\": [\n    {\n      \"id\": \"gB0NV05e\",\n      \"sku\": \"SKU-ERROR\",\n      \"preview_files\": {\n        \"front\": \"https://dimona.s3.us-east-1.amazonaws.com/dimonausa/image_1_mockup.png\"\n      },\n      \"print_files\": {\n        \"front\": \"https://dimona.s3.us-east-1.amazonaws.com/dimonausa/image_1_printfile.png\"\n      },\n      \"quantity\": 1\n    },\n    {\n      \"id\": \"yLA6m0oM\",\n      \"sku\": \"BLC-3001-BLACK-L\",\n      \"preview_files\": {\n        \"front\": \"https://dimona.s3.us-east-1.amazonaws.com/dimonausa/image_2_mockup.png\"\n      },\n      \"print_files\": {\n        \"front\": \"https://dimona.s3.us-east-1.amazonaws.com/dimonausa/image_2_printfile.png\"\n      },\n      \"quantity\": 1\n    }\n  ]\n}"
+								},
+								"url": {
+									"raw": "{{usa-api-domain}}/api/v2021/orders",
+									"host": [
+										"{{usa-api-domain}}"
+									],
+									"path": [
+										"api",
+										"v2021",
+										"orders"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Server",
+									"value": "nginx",
+									"uuid": "5d89c419-c2a5-4856-aa58-9717c25fc61c"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json",
+									"uuid": "4cdde5d7-008b-4f94-a97f-1a612e188a5a"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked",
+									"uuid": "2f518e9d-0153-425b-9aff-50b89bfa9d97"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive",
+									"uuid": "5ecf4d00-75d6-4ed6-802d-4ed9faa6c2e9"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, private",
+									"uuid": "f501ddb2-4263-4129-84c7-2cf5097a2657"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 28 Sep 2023 17:28:44 GMT",
+									"uuid": "e21d572b-ff51-421c-bc72-d7320fe011c0"
+								},
+								{
+									"key": "X-RateLimit-Limit",
+									"value": "120",
+									"uuid": "50879b9b-fb96-40bb-a6bd-a651efd067f8"
+								},
+								{
+									"key": "X-RateLimit-Remaining",
+									"value": "119",
+									"uuid": "4d9b1ea4-3f1f-4877-acab-59b9ac9eeaef"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*",
+									"uuid": "8e0b7e49-07d2-4fe5-a766-cd1f77c6faee"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"failed\",\n    \"errors\": [\n        {\n            \"items.0.sku\": \"The selected items.0.sku is invalid.\"\n        }\n    ]\n}"
+						},
+						{
+							"id": "c171e25b-bf6f-4fc5-96b6-b471af9bdf47",
+							"name": "Error: SKU out of stock",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"id\": \"orderReference2\",\n  \"sample\": false,\n  \"reprint\": false,\n  \"xqc\": false,\n  \"address_to\": {\n    \"address1\": \"1983 Tigertail Blvd\",\n    \"address2\": \"\",\n    \"city\": \"Dania Beach\", \n    \"zip\": \"33004\",\n    \"country\": \"US\",\n    \"region\": \"FL\",\n    \"first_name\": \"John\",\n    \"last_name\": \"Doe\"\n  },\n  \"address_from\": {\n    \"address1\": \"1983 Tigertail Blvd\",\n    \"address2\": \"\",\n    \"city\": \"Dania\",\n    \"zip\": \"33004\",\n    \"country\": \"US\",\n    \"region\": \"FL\",\n    \"company\": \"Tee USA LLC\"\n  },\n  \"shipping\": {\n    \"carrier\": \"USPS\",\n    \"priority\": \"Standard\"\n  },\n  \"items\": [\n    {\n      \"id\": \"gB0NV05e\",\n      \"sku\": \"BLC-8413-NAVYTRI-XL\",\n      \"preview_files\": {\n        \"front\": \"https://dimona.s3.us-east-1.amazonaws.com/dimonausa/image_1_mockup.png\"\n      },\n      \"print_files\": {\n        \"front\": \"https://dimona.s3.us-east-1.amazonaws.com/dimonausa/image_1_printfile.png\"\n      },\n      \"quantity\": 1\n    },\n    {\n      \"id\": \"yLA6m0oM\",\n      \"sku\": \"BLC-3001-BLACK-L\",\n      \"preview_files\": {\n        \"front\": \"https://dimona.s3.us-east-1.amazonaws.com/dimonausa/image_2_mockup.png\"\n      },\n      \"print_files\": {\n        \"front\": \"https://dimona.s3.us-east-1.amazonaws.com/dimonausa/image_2_printfile.png\"\n      },\n      \"quantity\": 1\n    }\n  ]\n}"
+								},
+								"url": {
+									"raw": "{{usa-api-domain}}/api/v2021/orders",
+									"host": [
+										"{{usa-api-domain}}"
+									],
+									"path": [
+										"api",
+										"v2021",
+										"orders"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Server",
+									"value": "nginx",
+									"uuid": "baf440c0-eb97-4bca-885b-da300d5212a2"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json",
+									"uuid": "e88271d4-b6ca-453c-a538-2af3802cbd7f"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked",
+									"uuid": "25752d78-21ba-4b42-8f4a-be890929ce17"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive",
+									"uuid": "9718323b-f62c-4a09-b613-8bdb390a57f0"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, private",
+									"uuid": "ddf710bd-76a8-4f59-b112-e330360bcb9b"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 28 Sep 2023 17:29:40 GMT",
+									"uuid": "fc312f50-e268-4f14-b5a7-f5f8218d3c8f"
+								},
+								{
+									"key": "X-RateLimit-Limit",
+									"value": "120",
+									"uuid": "3c5f55a0-34a3-437b-b99b-d194fa996e17"
+								},
+								{
+									"key": "X-RateLimit-Remaining",
+									"value": "115",
+									"uuid": "f49294a6-cfdb-4904-8641-8863e805f6a3"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*",
+									"uuid": "18d88576-d306-447e-af24-04bef151fb09"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"failed\",\n    \"errors\": {\n        \"items.gB0NV05e\": \"This item is out of stock!\"\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Retrieve a production order",
+					"id": "a88c77c5-cd87-4883-9bde-1b12d1c8383f",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{usa-api-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{usa-api-domain}}/api/v2021/orders/{{order-uuid}}",
+							"host": [
+								"{{usa-api-domain}}"
+							],
+							"path": [
+								"api",
+								"v2021",
+								"orders",
+								"{{order-uuid}}"
+							]
+						},
+						"description": "## 📦 Retrieve a Production Order\n\nGet full details of a submitted production order using its `reference_id`.\n\nThis endpoint returns the order’s current status, shipping details, item list and  \ntracking info (if shipped).\n\n### ⚠️ Notes\n\n- Order-level status does not reflect per-item events — for a detailed timeline, use `GET /order/{id}/events`.\n    \n\n### 🔍 Use Cases\n\n- Track order progress in real-time\n    \n- Display shipping status and tracking to customers\n    \n\n### 📋 Order Status Values\n\n| Status | Description |\n| --- | --- |\n| `Pending` | Order received |\n| `In Production` | Items are currently being printed/manufactured |\n| `Shipped` | Order dispatched with tracking |\n| `Cancelled` | Order was cancelled |\n\n### 🔄 Common Status Flows\n\n- **Standard:** `Pending` → `In Production` → `Shipped`\n    \n- **Cancelled:** Any status → `Cancelled` (restrictions apply)\n    \n\n### 🧾 Response Includes\n\n- `id`, `reference_id`\n    \n- Full address info (`address_to`, `address_from`)\n    \n- `status`, `created_at`, `updated_at`\n    \n- All `items` with print files and status\n    \n- `tracking_number`"
+					},
+					"response": [
+						{
+							"id": "918ae50e-2210-41ec-8b75-732105ed3814",
+							"name": "Retrieve a production order",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{usa-api-domain}}/api/v2021/orders/{{order-uuid}}",
+									"host": [
+										"{{usa-api-domain}}"
+									],
+									"path": [
+										"api",
+										"v2021",
+										"orders",
+										"{{order-uuid}}"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Server",
+									"value": "nginx",
+									"uuid": "934141af-2d02-4b70-8fc8-8b36894bde96"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json",
+									"uuid": "bd69e4be-b7bf-4567-939c-e8900e022c79"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked",
+									"uuid": "dde45918-ade2-451f-a39a-977bfcb17f28"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive",
+									"uuid": "6eafb510-752d-4bcd-9d32-02ca7e1ec151"
+								},
+								{
+									"key": "Vary",
+									"value": "Accept-Encoding",
+									"uuid": "52e834b2-b432-4499-8964-53592287ceb5"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, private",
+									"uuid": "9330fc6c-12c2-4017-a738-2dde477e5689"
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 18 Apr 2025 14:37:55 GMT",
+									"uuid": "67d652c6-1946-4a16-843f-82092d1a25e4"
+								},
+								{
+									"key": "X-RateLimit-Limit",
+									"value": "120",
+									"uuid": "b5518f83-1e24-4cad-b981-5465b5907db7"
+								},
+								{
+									"key": "X-RateLimit-Remaining",
+									"value": "119",
+									"uuid": "96195c1e-44f8-44e1-9e00-04947cd6ea49"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*",
+									"uuid": "d2f37a3a-aa7f-4a5e-8b11-17a466fa381b"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "SAMEORIGIN",
+									"uuid": "c3e525a2-99c4-4c16-aa65-8b257091689f"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "1; mode=block",
+									"uuid": "841d3a79-8d38-49c5-b6a6-cbb54d8a9156"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff",
+									"uuid": "dc45e08d-9398-4119-9bf0-a8ea7181ff58"
+								},
+								{
+									"key": "Content-Encoding",
+									"value": "gzip",
+									"uuid": "49c656ae-9769-4a07-8b7f-63412108672d"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"id\": \"spfy_5_12341234\",\n    \"reference_id\": \"1234e5a1-1234-1234-1234-f3f9a4ccf8c9\",\n    \"sample\": false,\n    \"reprint\": false,\n    \"xqc\": false,\n    \"status\": \"Shipped\",\n    \"address_to\": {\n        \"address1\": \"1983 Tigertail Blvd\",\n        \"address2\": \"\",\n        \"city\": \"Dania Beach\",\n        \"zip\": \"33004\",\n        \"country\": \"US\",\n        \"region\": \"FL\",\n        \"first_name\": \"John\",\n        \"last_name\": \"Doe\",\n        \"email\": \"\",\n        \"phone\": \"+11231231234\"\n    },\n    \"address_from\": {\n        \"address1\": \"1983 Tigertail Blvd\",\n        \"address2\": null,\n        \"city\": \"Dania Beach\",\n        \"zip\": \"33004\",\n        \"country\": \"US\",\n        \"region\": \"FL\",\n        \"company\": \"Shipping Department\",\n        \"email\": \"api@dimonatee.com\",\n        \"phone\": \"7862967000\"\n    },\n    \"shipping\": {\n        \"carrier\": \"Default\",\n        \"priority\": \"\"\n    },\n    \"items\": [\n        {\n            \"id\": \"12806896812172\",\n            \"sku\": \"GLD-5000-WHITE-XL\",\n            \"preview_files\": {\n                \"front\": \"https://front_preview_file.com\"\n            },\n            \"print_files\": {\n                \"front\": \"https://front_print_file.com\"\n            },\n            \"quantity\": 1\n        }\n    ],\n    \"tracking_url\": \"https://track.easypost.com/123412341234\",\n    \"tracking_number\": \"9400.....\",\n    \"carrier\": \"USPS\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Cancel Production Order",
+					"id": "40f04768-12f6-4d7f-9e78-6c22911ea1d3",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"items\": [\n    \n  ]\n}"
+						},
+						"url": {
+							"raw": "{{usa-api-domain}}/api/v2021/order/{{order-uuid}}/cancel",
+							"host": [
+								"{{usa-api-domain}}"
+							],
+							"path": [
+								"api",
+								"v2021",
+								"order",
+								"{{order-uuid}}",
+								"cancel"
+							]
+						},
+						"description": "## ❌ Cancel Production Order\n\nCancel an order before it enters production or shipping.\n\nThis endpoint allows full or partial cancellation of production orders, depending on their current status. You can cancel the entire order or specific items, and optionally provide a reason and notes for better traceability.\n\n### 🕒 When Cancellation Is Allowed\n\n- ✅ `Pending`: Always cancellable\n    \n- ❌ `In Production`, `Shipped`: Not cancellable via API (contact support)\n    \n    - Orders in In Production status may still be cancellable if all SKUs meet specific eligibility criteria.\n        \n- ⚠️ Special Cases: Samples and reprints may follow different rules\n    \n\n### 🛠 Partial Cancellations\n\nYou can cancel individual items within the order by passing an array of item IDs. The rest of the order continues through the normal flow."
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve Order Events",
+					"id": "777b0354-14d3-414c-9268-1b110d3be3a8",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{usa-api-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{usa-api-domain}}/api/v2021/order/{{order-uuid}}/events",
+							"host": [
+								"{{usa-api-domain}}"
+							],
+							"path": [
+								"api",
+								"v2021",
+								"order",
+								"{{order-uuid}}",
+								"events"
+							]
+						},
+						"description": "## 📜 Retrieve Order Events\n\nFetch a detailed timeline of all production-related events for a given order.\n\nUnlike the main order status (which reflects the order as a whole), this endpoint returns **granular item-level actions**, including printing, packaging, and shipping steps — with timestamps and affected item IDs.\n\n### 📚 Use Cases\n\n- Visualize step-by-step progress of an order\n    \n- Build a production dashboard or internal tracking UI\n    \n- Debug production delays or errors\n    \n- Generate audit logs or reporting based on actual timestamps\n    \n\n### 🧾 Event Format\n\nEach event contains:\n\n| Field | Type | Description |\n| --- | --- | --- |\n| `time` | string | ISO 8601 timestamp when the event occurred |\n| `action` | string | Type of event (e.g. `created`, `picked`, `printed`, `packaged`, `shipped`) |\n| `affected_items` | string\\[\\] | Array of item IDs affected by this action |\n| `tracking_number` | string | (Only on `shipped`) The tracking number assigned |\n| `carrier` | string | (Only on `shipped`) The carrier used for fulfillment |"
+					},
+					"response": [
+						{
+							"id": "fa8bb13f-91ab-463f-9e42-bb3568f82364",
+							"name": "Retrieve Order Events",
+							"originalRequest": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{usa-api-domain}}/api/v2021/order/{{order-uuid}}/events",
+									"host": [
+										"{{usa-api-domain}}"
+									],
+									"path": [
+										"api",
+										"v2021",
+										"order",
+										"{{order-uuid}}",
+										"events"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Server",
+									"value": "nginx",
+									"uuid": "21f5b36b-43cf-4cc8-b99c-a841b984191e"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json",
+									"uuid": "e0fec1a2-b5be-4024-aea4-45584ca76769"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked",
+									"uuid": "1a39f5b4-9ddf-4540-a15d-fcbd1501c6d6"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive",
+									"uuid": "0473354e-22e0-46c1-935c-4390adac377b"
+								},
+								{
+									"key": "Vary",
+									"value": "Accept-Encoding",
+									"uuid": "278c8604-aa97-46b5-b076-8a45e7c1aad5"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, private",
+									"uuid": "f668ef0b-edc3-42be-a32d-47e13bd1e915"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 27 May 2025 19:54:30 GMT",
+									"uuid": "fd20a9b6-ce59-4b40-b23c-be6b1d05077b"
+								},
+								{
+									"key": "X-RateLimit-Limit",
+									"value": "120",
+									"uuid": "34817641-ca64-458f-a5be-410574186332"
+								},
+								{
+									"key": "X-RateLimit-Remaining",
+									"value": "119",
+									"uuid": "56e2f5d6-f9f4-487c-9df8-47a543526c65"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*",
+									"uuid": "a474b550-3185-4718-b17b-91f6744084bd"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "SAMEORIGIN",
+									"uuid": "878a3106-abcd-4c9d-aed3-76d47f777bb7"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "1; mode=block",
+									"uuid": "7adbbaa3-f071-4f56-b2e8-d654a2818d5b"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff",
+									"uuid": "f28d8f1a-59f1-4dfc-8819-5d2da77da4c0"
+								},
+								{
+									"key": "Content-Encoding",
+									"value": "gzip",
+									"uuid": "c756fc90-bcd8-4b39-96b3-343e9ae9c1d4"
+								}
+							],
+							"cookie": [
+								{
+									"expires": "Invalid Date"
+								}
+							],
+							"body": "{\n    \"status\": \"shipped\",\n    \"events\": [\n        {\n            \"time\": \"2025-05-27T14:00:05+00:00\",\n            \"action\": \"created\",\n            \"affected_items\": [\n                \"1234\",\n                \"1235\",\n                \"1236\",\n                \"1237\",\n                \"pck-insert\"\n            ]\n        },\n        {\n            \"time\": \"2025-05-27T15:03:58+00:00\",\n            \"action\": \"picked\",\n            \"affected_items\": [\n                \"1234\",\n                \"1235\",\n                \"1236\"\n            ]\n        },\n        {\n            \"time\": \"2025-05-27T15:03:59+00:00\",\n            \"action\": \"picked\",\n            \"affected_items\": [\n                \"1237\"\n            ]\n        },\n        {\n            \"time\": \"2025-05-27T15:11:05+00:00\",\n            \"action\": \"printed\",\n            \"affected_items\": [\n                \"1234\"\n            ]\n        },\n        {\n            \"time\": \"2025-05-27T15:11:28+00:00\",\n            \"action\": \"printed\",\n            \"affected_items\": [\n                \"1235\"\n            ]\n        },\n        {\n            \"time\": \"2025-05-27T15:11:32+00:00\",\n            \"action\": \"printed\",\n            \"affected_items\": [\n                \"1236\"\n            ]\n        },\n        {\n            \"time\": \"2025-05-27T15:30:21+00:00\",\n            \"action\": \"printed\",\n            \"affected_items\": [\n                \"1237\"\n            ]\n        },\n        {\n            \"time\": \"2025-05-27T18:10:28+00:00\",\n            \"action\": \"packaged\",\n            \"affected_items\": [\n                \"1234\"\n            ]\n        },\n        {\n            \"time\": \"2025-05-27T18:11:05+00:00\",\n            \"action\": \"packaged\",\n            \"affected_items\": [\n                \"1235\"\n            ]\n        },\n        {\n            \"time\": \"2025-05-27T18:11:43+00:00\",\n            \"action\": \"packaged\",\n            \"affected_items\": [\n                \"1236\"\n            ]\n        },\n        {\n            \"time\": \"2025-05-27T18:12:24+00:00\",\n            \"action\": \"packaged\",\n            \"affected_items\": [\n                \"1237\"\n            ]\n        },\n        {\n            \"time\": \"2025-05-27T18:12:29+00:00\",\n            \"action\": \"shipped\",\n            \"affected_items\": [\n                \"1234\",\n                \"1235\",\n                \"1236\",\n                \"1237\"\n            ],\n            \"tracking_url\": \"https://track.easypost.com/tracking_here\",\n            \"tracking_number\": \"Tracking Here\",\n            \"carrier\": \"Carrier\"\n        }\n    ]\n}"
+						}
+					]
+				},
+				{
+					"name": "Submit a production order - Legacy Payload",
+					"id": "df5c70f9-1159-4358-a2ad-8947a6a0baa4",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{usa-api-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"shipping_speed\": \"USPS\",\n    \"delivery_method_id\": \"Ground Advantage\",\n    \"order_id\": \"your-order-id\",\n    \"customer_name\": \"John Doe\",\n    \"customer_document\": \"legacy field\",\n    \"customer_email\": \"example@gmail.com\",\n    \"items\": [\n        {\n            \"name\": \"legacy field\",\n            \"sku\": \"Your Gildan 5000 SKU\",\n            \"qty\": 2,\n            \"dimona_sku_id\": \"GLD-5000-WHITE-XL\",\n            \"designs\": {\n                \"front\": \"https://url-to-front\",\n                \"back\": \"https://url-to-back\",\n                \"left_sleeve\": \"https://url-to-left-sleeve\",\n                \"right_sleeve\": \"https://url-to-right-sleeve\",\n                \"inner_label\": \"https://url-to-inner-label\",\n                \"outer_label\": \"https://url-to-outer-label\"\n            },\n            \"mocks\": {\n                \"front\": \"https://url-to-front-mock\",\n                \"back\": \"https://url-to-back-mock\",\n                \"left_sleeve\": \"https://url-to-left-sleeve-mock\",\n                \"right_sleeve\": \"https://url-to-right-sleeve-mock\",\n                \"inner_label\": \"https://url-to-inner-label-mock\",\n                \"outer_label\": \"https://url-to-outer-label-mock\"\n            }\n        }\n    ],\n    \"nfe\": { \n        \"chave\": \"legacy\",\n        \"serie\": \"legacy\",\n        \"numero\": \"legacy\",\n        \"link\": \"legacy\"\n    },\n    \"address\": {\n        \"street\": \"Rua Buenos Aires\",\n        \"number\": \"334\",\n        \"complement\": \"Loja\",\n        \"city\": \"Rio de Janeiro\",\n        \"state\": \"RJ\",\n        \"zipcode\": \"20061000\",\n        \"neighborhood\": \"Centro\",\n        \"phone\": \"21 21093661\",\n        \"country\": \"BR\"\n    }\n}"
+						},
+						"url": {
+							"raw": "{{usa-api-domain}}/api/v3/orders",
+							"host": [
+								"{{usa-api-domain}}"
+							],
+							"path": [
+								"api",
+								"v3",
+								"orders"
+							]
+						},
+						"description": "## 🗂️ Submit a Production Order – Legacy Payload\n\nLegacy version of the production order submission endpoint, maintained for backward compatibility with older Brazil-based integrations.\n\nUse this only if you’re still using the legacy structure from `/api/v3/orders`. All new integrations should use the standard `/api/v2021/orders` format.\n\n### 🧭 Purpose\n\nThis endpoint allows systems using the Brazil API format to continue working without immediate migration. Fields are mapped internally to the current standard format.\n\n### 📚 Use Cases\n\n- Existing Shopify apps or marketplaces integrated before 2021\n    \n- Gradual migration of legacy systems to new API structure\n    \n- Internal tooling still using old payload shape\n    \n\n### 🔄 Key Field Mappings\n\n| Legacy Field | Mapped To |\n| --- | --- |\n| `order_id` | `id` |\n| `customer_name` | `address_to.first_name` + `last_name` |\n| `customer_email` | `address_to.email` |\n| `qty` | `quantity` |\n| `designs` | `print_files` |\n| `mocks` | `preview_files` |\n| `address.street` + `number` | `address_to.address1` |\n| `zipcode` | `address_to.zip` |\n\n### ❌ Ignored Fields (Brazil-specific)\n\n- `customer_document`: Not used in U.S. operations\n    \n- `nfe`: Tax invoice for Brazil, ignored elsewhere\n    \n- `address.neighborhood`: Not part of U.S. addressing format\n    \n\n### 🌎 Regional Behavior\n\n- **Brazil Orders**: Brazil-specific fields (e.g. `nfe`, `customer_document`) are processed\n    \n- **US/International**: Those fields are ignored gracefully; U.S. rules applied\n    \n\n### ⚠️ Deprecation Notice\n\nThis endpoint will continue to function but is **deprecated**. Please plan to:\n\n1. Update your payloads to match the `/v2021/orders` format\n    \n2. Use field names compatible with the current schema\n    \n3. Remove reliance on this endpoint within 12 months"
+					},
+					"response": [
+						{
+							"id": "fcac3cb3-a978-4c74-9809-cc56fc7399b7",
+							"name": "Success: Order Created",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"id\": \"orderReference\",\n  \"sample\": false,\n  \"reprint\": false,\n  \"xqc\": false,\n  \"address_to\": {\n    \"address1\": \"1983 Tigertail Blvd\",\n    \"address2\": \"\",\n    \"city\": \"Dania Beach\", \n    \"zip\": \"33004\",\n    \"country\": \"US\",\n    \"region\": \"FL\",\n    \"first_name\": \"John\",\n    \"last_name\": \"Doe\"\n  },\n  \"address_from\": {\n    \"address1\": \"1983 Tigertail Blvd\",\n    \"address2\": \"\",\n    \"city\": \"Dania\",\n    \"zip\": \"33004\",\n    \"country\": \"US\",\n    \"region\": \"FL\",\n    \"company\": \"Tee USA LLC\"\n  },\n  \"shipping\": {\n    \"carrier\": \"USPS\",\n    \"priority\": \"Standard\"\n  },\n  \"items\": [\n    {\n      \"id\": \"gB0NV05e\",\n      \"sku\": \"BLC-3001-BLACK-L\",\n      \"preview_files\": {\n        \"front\": \"https://dimona.s3.us-east-1.amazonaws.com/dimonausa/image_1_mockup.png\"\n      },\n      \"print_files\": {\n        \"front\": \"https://dimona.s3.us-east-1.amazonaws.com/dimonausa/image_1_printfile.png\"\n      },\n      \"quantity\": 1\n    },\n    {\n      \"id\": \"yLA6m0oM\",\n      \"sku\": \"BLC-3001-BLACK-L\",\n      \"preview_files\": {\n        \"front\": \"https://dimona.s3.us-east-1.amazonaws.com/dimonausa/image_2_mockup.png\"\n      },\n      \"print_files\": {\n        \"front\": \"https://dimona.s3.us-east-1.amazonaws.com/dimonausa/image_2_printfile.png\"\n      },\n      \"quantity\": 1\n    }\n  ]\n}"
+								},
+								"url": {
+									"raw": "{{usa-api-domain}}/api/v2021/orders",
+									"host": [
+										"{{usa-api-domain}}"
+									],
+									"path": [
+										"api",
+										"v2021",
+										"orders"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Server",
+									"value": "nginx",
+									"uuid": "f736280e-e884-46b9-90bf-e485143050dd"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json",
+									"uuid": "c27eea94-8c78-4b7a-b845-bc0d9e354174"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked",
+									"uuid": "d4e33eba-7544-48a3-bae1-c10d33cb0840"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive",
+									"uuid": "b48afe6e-1afa-4db0-951a-85baa130563e"
+								},
+								{
+									"key": "Vary",
+									"value": "Accept-Encoding",
+									"uuid": "d787a9cf-c437-426f-90ac-047ca0daf96f"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, private",
+									"uuid": "0d592672-dd22-4a45-89e7-cac798fdb890"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 28 Sep 2023 17:27:06 GMT",
+									"uuid": "de0849ed-ac9d-4290-8dba-14f36c5ef0e4"
+								},
+								{
+									"key": "X-RateLimit-Limit",
+									"value": "120",
+									"uuid": "665c4767-8f77-4a3b-a856-5daceed95379"
+								},
+								{
+									"key": "X-RateLimit-Remaining",
+									"value": "119",
+									"uuid": "bb09c3c6-ec68-4945-a062-7bd4b73085fc"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*",
+									"uuid": "f87369d9-05e1-4ecc-ade1-aa6c5c50187f"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "SAMEORIGIN",
+									"uuid": "d38f592e-80ad-42f1-b86f-0181285277d7"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "1; mode=block",
+									"uuid": "137d3b6b-c1d0-4fc3-a182-18390d95c09b"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff",
+									"uuid": "f48bd6ba-6f5f-41ed-8711-4346250d7e21"
+								},
+								{
+									"key": "Content-Encoding",
+									"value": "gzip",
+									"uuid": "d155d79f-7fe0-4a79-8b0d-c0f3621b447d"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"success\",\n    \"id\": \"orderReference\",\n    \"reference_id\": \"a4083bf5-8f45-467c-9b98-bd8334928b06\"\n}"
+						},
+						{
+							"id": "ccb23c87-d62f-4376-8aff-221f370cbd94",
+							"name": "Error: Duplicated Order",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"id\": \"orderReference\",\n  \"sample\": false,\n  \"reprint\": false,\n  \"xqc\": false,\n  \"address_to\": {\n    \"address1\": \"1983 Tigertail Blvd\",\n    \"address2\": \"\",\n    \"city\": \"Dania Beach\", \n    \"zip\": \"33004\",\n    \"country\": \"US\",\n    \"region\": \"FL\",\n    \"first_name\": \"John\",\n    \"last_name\": \"Doe\"\n  },\n  \"address_from\": {\n    \"address1\": \"1983 Tigertail Blvd\",\n    \"address2\": \"\",\n    \"city\": \"Dania\",\n    \"zip\": \"33004\",\n    \"country\": \"US\",\n    \"region\": \"FL\",\n    \"company\": \"Tee USA LLC\"\n  },\n  \"shipping\": {\n    \"carrier\": \"USPS\",\n    \"priority\": \"Standard\"\n  },\n  \"items\": [\n    {\n      \"id\": \"gB0NV05e\",\n      \"sku\": \"BLC-3001-BLACK-L\",\n      \"preview_files\": {\n        \"front\": \"https://dimona.s3.us-east-1.amazonaws.com/dimonausa/image_1_mockup.png\"\n      },\n      \"print_files\": {\n        \"front\": \"https://dimona.s3.us-east-1.amazonaws.com/dimonausa/image_1_printfile.png\"\n      },\n      \"quantity\": 1\n    },\n    {\n      \"id\": \"yLA6m0oM\",\n      \"sku\": \"BLC-3001-BLACK-L\",\n      \"preview_files\": {\n        \"front\": \"https://dimona.s3.us-east-1.amazonaws.com/dimonausa/image_2_mockup.png\"\n      },\n      \"print_files\": {\n        \"front\": \"https://dimona.s3.us-east-1.amazonaws.com/dimonausa/image_2_printfile.png\"\n      },\n      \"quantity\": 1\n    }\n  ]\n}"
+								},
+								"url": {
+									"raw": "{{usa-api-domain}}/api/v2021/orders",
+									"host": [
+										"{{usa-api-domain}}"
+									],
+									"path": [
+										"api",
+										"v2021",
+										"orders"
+									]
+								}
+							},
+							"status": "Not Modified",
+							"code": 304,
+							"_postman_previewlanguage": "plain",
+							"header": [
+								{
+									"key": "Server",
+									"value": "nginx",
+									"uuid": "eed3753f-a2cd-4efe-ab0a-30249da9521b"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive",
+									"uuid": "1091d111-ef86-43b5-bcab-ff6f1ee79a49"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, private",
+									"uuid": "a44232e8-42de-4533-b1ec-1bdb02c68144"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 28 Sep 2023 17:27:32 GMT",
+									"uuid": "f42112d0-d216-4925-9438-82a4c52f3ab1"
+								},
+								{
+									"key": "X-RateLimit-Limit",
+									"value": "120",
+									"uuid": "a4088f09-0757-4e9b-8457-889bd1e991d2"
+								},
+								{
+									"key": "X-RateLimit-Remaining",
+									"value": "118",
+									"uuid": "0c33c259-d1d9-4927-8a97-7eb4c7463d93"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*",
+									"uuid": "5a5584d9-935a-4ea2-91c1-7f9fa9f2185f"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "SAMEORIGIN",
+									"uuid": "bd080617-dd6a-47a6-ad7c-5ca817817724"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "1; mode=block",
+									"uuid": "ad860a05-5151-4b00-892f-39b65a8003c7"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff",
+									"uuid": "7e8b3a28-acd6-4bc9-b085-c02880873134"
+								}
+							],
+							"cookie": [],
+							"body": null
+						},
+						{
+							"id": "dff61c44-d52f-4b5e-a1af-ffd5e527c87f",
+							"name": "Error: Unauthenticated",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"id\": \"orderReference\",\n  \"sample\": false,\n  \"reprint\": false,\n  \"xqc\": false,\n  \"address_to\": {\n    \"address1\": \"1983 Tigertail Blvd\",\n    \"address2\": \"\",\n    \"city\": \"Dania Beach\", \n    \"zip\": \"33004\",\n    \"country\": \"US\",\n    \"region\": \"FL\",\n    \"first_name\": \"John\",\n    \"last_name\": \"Doe\"\n  },\n  \"address_from\": {\n    \"address1\": \"1983 Tigertail Blvd\",\n    \"address2\": \"\",\n    \"city\": \"Dania\",\n    \"zip\": \"33004\",\n    \"country\": \"US\",\n    \"region\": \"FL\",\n    \"company\": \"Tee USA LLC\"\n  },\n  \"shipping\": {\n    \"carrier\": \"USPS\",\n    \"priority\": \"Standard\"\n  },\n  \"items\": [\n    {\n      \"id\": \"gB0NV05e\",\n      \"sku\": \"BLC-3001-BLACK-L\",\n      \"preview_files\": {\n        \"front\": \"https://dimona.s3.us-east-1.amazonaws.com/dimonausa/image_1_mockup.png\"\n      },\n      \"print_files\": {\n        \"front\": \"https://dimona.s3.us-east-1.amazonaws.com/dimonausa/image_1_printfile.png\"\n      },\n      \"quantity\": 1\n    },\n    {\n      \"id\": \"yLA6m0oM\",\n      \"sku\": \"BLC-3001-BLACK-L\",\n      \"preview_files\": {\n        \"front\": \"https://dimona.s3.us-east-1.amazonaws.com/dimonausa/image_2_mockup.png\"\n      },\n      \"print_files\": {\n        \"front\": \"https://dimona.s3.us-east-1.amazonaws.com/dimonausa/image_2_printfile.png\"\n      },\n      \"quantity\": 1\n    }\n  ]\n}"
+								},
+								"url": {
+									"raw": "{{usa-api-domain}}/api/v2021/orders",
+									"host": [
+										"{{usa-api-domain}}"
+									],
+									"path": [
+										"api",
+										"v2021",
+										"orders"
+									]
+								}
+							},
+							"status": "Unauthorized",
+							"code": 401,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Server",
+									"value": "nginx",
+									"uuid": "b392454d-f0e8-4d97-a417-cd235a6f1c31"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json",
+									"uuid": "48a9febc-45e4-49db-8c76-3fc3bdb18048"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked",
+									"uuid": "a798deb6-2512-4461-afa5-4412533a6ad6"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive",
+									"uuid": "3db759f9-92d3-4927-bbdf-1ae14c760cca"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, private",
+									"uuid": "17118c34-3c23-4033-b392-611ce3af7fec"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 28 Sep 2023 17:23:04 GMT",
+									"uuid": "a20fafda-ac93-448e-90c7-2f04db2b632d"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*",
+									"uuid": "4108d753-ee53-4ec3-94e3-e17cd39d0fe1"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"Unauthenticated.\"\n}"
+						},
+						{
+							"id": "365b043d-2b72-402e-b226-48c5bf36fa1f",
+							"name": "Error: Invalid SKU",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"id\": \"orderReference\",\n  \"sample\": false,\n  \"reprint\": false,\n  \"xqc\": false,\n  \"address_to\": {\n    \"address1\": \"1983 Tigertail Blvd\",\n    \"address2\": \"\",\n    \"city\": \"Dania Beach\", \n    \"zip\": \"33004\",\n    \"country\": \"US\",\n    \"region\": \"FL\",\n    \"first_name\": \"John\",\n    \"last_name\": \"Doe\"\n  },\n  \"address_from\": {\n    \"address1\": \"1983 Tigertail Blvd\",\n    \"address2\": \"\",\n    \"city\": \"Dania\",\n    \"zip\": \"33004\",\n    \"country\": \"US\",\n    \"region\": \"FL\",\n    \"company\": \"Tee USA LLC\"\n  },\n  \"shipping\": {\n    \"carrier\": \"USPS\",\n    \"priority\": \"Standard\"\n  },\n  \"items\": [\n    {\n      \"id\": \"gB0NV05e\",\n      \"sku\": \"SKU-ERROR\",\n      \"preview_files\": {\n        \"front\": \"https://dimona.s3.us-east-1.amazonaws.com/dimonausa/image_1_mockup.png\"\n      },\n      \"print_files\": {\n        \"front\": \"https://dimona.s3.us-east-1.amazonaws.com/dimonausa/image_1_printfile.png\"\n      },\n      \"quantity\": 1\n    },\n    {\n      \"id\": \"yLA6m0oM\",\n      \"sku\": \"BLC-3001-BLACK-L\",\n      \"preview_files\": {\n        \"front\": \"https://dimona.s3.us-east-1.amazonaws.com/dimonausa/image_2_mockup.png\"\n      },\n      \"print_files\": {\n        \"front\": \"https://dimona.s3.us-east-1.amazonaws.com/dimonausa/image_2_printfile.png\"\n      },\n      \"quantity\": 1\n    }\n  ]\n}"
+								},
+								"url": {
+									"raw": "{{usa-api-domain}}/api/v2021/orders",
+									"host": [
+										"{{usa-api-domain}}"
+									],
+									"path": [
+										"api",
+										"v2021",
+										"orders"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Server",
+									"value": "nginx",
+									"uuid": "01da596c-d00e-433a-abe1-3b0062f29907"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json",
+									"uuid": "5ca7919b-a15c-42ea-bc21-d85fa336310d"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked",
+									"uuid": "48ab18d7-6a83-4730-8b29-426321eefb8b"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive",
+									"uuid": "86afb3d5-ed7c-4e0d-9908-c479a21c512b"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, private",
+									"uuid": "c495a58f-5967-4f5e-a17d-e5e5b42613f7"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 28 Sep 2023 17:28:44 GMT",
+									"uuid": "92e1df95-8c9d-48a5-b533-865c57b5248e"
+								},
+								{
+									"key": "X-RateLimit-Limit",
+									"value": "120",
+									"uuid": "cbfdd9f1-0200-4d4f-95ea-f34bf1421a16"
+								},
+								{
+									"key": "X-RateLimit-Remaining",
+									"value": "119",
+									"uuid": "638a9c7c-3f26-4475-89c6-3c5ede972e75"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*",
+									"uuid": "cbcd4ad9-d339-4234-a75d-18de9c686b43"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"failed\",\n    \"errors\": [\n        {\n            \"items.0.sku\": \"The selected items.0.sku is invalid.\"\n        }\n    ]\n}"
+						},
+						{
+							"id": "86a7492e-426e-41b1-bd3b-13ca3f48c5a5",
+							"name": "Error: SKU out of stock",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"id\": \"orderReference2\",\n  \"sample\": false,\n  \"reprint\": false,\n  \"xqc\": false,\n  \"address_to\": {\n    \"address1\": \"1983 Tigertail Blvd\",\n    \"address2\": \"\",\n    \"city\": \"Dania Beach\", \n    \"zip\": \"33004\",\n    \"country\": \"US\",\n    \"region\": \"FL\",\n    \"first_name\": \"John\",\n    \"last_name\": \"Doe\"\n  },\n  \"address_from\": {\n    \"address1\": \"1983 Tigertail Blvd\",\n    \"address2\": \"\",\n    \"city\": \"Dania\",\n    \"zip\": \"33004\",\n    \"country\": \"US\",\n    \"region\": \"FL\",\n    \"company\": \"Tee USA LLC\"\n  },\n  \"shipping\": {\n    \"carrier\": \"USPS\",\n    \"priority\": \"Standard\"\n  },\n  \"items\": [\n    {\n      \"id\": \"gB0NV05e\",\n      \"sku\": \"BLC-8413-NAVYTRI-XL\",\n      \"preview_files\": {\n        \"front\": \"https://dimona.s3.us-east-1.amazonaws.com/dimonausa/image_1_mockup.png\"\n      },\n      \"print_files\": {\n        \"front\": \"https://dimona.s3.us-east-1.amazonaws.com/dimonausa/image_1_printfile.png\"\n      },\n      \"quantity\": 1\n    },\n    {\n      \"id\": \"yLA6m0oM\",\n      \"sku\": \"BLC-3001-BLACK-L\",\n      \"preview_files\": {\n        \"front\": \"https://dimona.s3.us-east-1.amazonaws.com/dimonausa/image_2_mockup.png\"\n      },\n      \"print_files\": {\n        \"front\": \"https://dimona.s3.us-east-1.amazonaws.com/dimonausa/image_2_printfile.png\"\n      },\n      \"quantity\": 1\n    }\n  ]\n}"
+								},
+								"url": {
+									"raw": "{{usa-api-domain}}/api/v2021/orders",
+									"host": [
+										"{{usa-api-domain}}"
+									],
+									"path": [
+										"api",
+										"v2021",
+										"orders"
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Server",
+									"value": "nginx",
+									"uuid": "8d424c49-2c47-48ca-9892-5decae913ed8"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json",
+									"uuid": "847feb17-c148-43cc-a298-fcb2da55ac3e"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked",
+									"uuid": "9a7f85aa-1e62-4ecd-9d5d-b37786f6c739"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive",
+									"uuid": "29923b3e-2c6e-488f-9c60-0eb3bb4e787d"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, private",
+									"uuid": "a3a05210-49e3-4f40-9d4b-c604498fc828"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 28 Sep 2023 17:29:40 GMT",
+									"uuid": "624589ba-e357-40c3-aeb9-72fbc3c103b9"
+								},
+								{
+									"key": "X-RateLimit-Limit",
+									"value": "120",
+									"uuid": "49003792-034a-46de-8450-cce437f12f21"
+								},
+								{
+									"key": "X-RateLimit-Remaining",
+									"value": "115",
+									"uuid": "b12e53ce-f5dd-4e89-ae6b-f6242cbda6ee"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*",
+									"uuid": "b6c8c364-43a6-453e-9944-b3c7d82bc033"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"failed\",\n    \"errors\": {\n        \"items.gB0NV05e\": \"This item is out of stock!\"\n    }\n}"
+						},
+						{
+							"id": "c602b75a-6c9e-4e74-878a-836d63505110",
+							"name": "Submit a production order - with legacy payload - success",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"shipping_speed\": \"USPS\",\n    \"delivery_method_id\": \"Ground Advantage\",\n    \"order_id\": \"your-order-id\",\n    \"customer_name\": \"John Doe\",\n    \"customer_document\": \"legacy field\",\n    \"customer_email\": \"example@gmail.com\",\n    \"items\": [\n        {\n            \"name\": \"legacy field\",\n            \"sku\": \"Your Gildan 5000 SKU\",\n            \"qty\": 2,\n            \"dimona_sku_id\": \"GLD-5000-WHITE-XL\",\n            \"designs\": {\n                \"front\": \"https://url-to-front\",\n                \"back\": \"https://url-to-back\",\n                \"left_sleeve\": \"https://url-to-left-sleeve\",\n                \"right_sleeve\": \"https://url-to-right-sleeve\",\n                \"inner_label\": \"https://url-to-inner-label\",\n                \"outer_label\": \"https://url-to-outer-label\"\n            },\n            \"mocks\": {\n                \"front\": \"https://url-to-front-mock\",\n                \"back\": \"https://url-to-back-mock\",\n                \"left_sleeve\": \"https://url-to-left-sleeve-mock\",\n                \"right_sleeve\": \"https://url-to-right-sleeve-mock\",\n                \"inner_label\": \"https://url-to-inner-label-mock\",\n                \"outer_label\": \"https://url-to-outer-label-mock\"\n            }\n        }\n    ],\n    \"nfe\": { \n        \"chave\": \"legacy\",\n        \"serie\": \"legacy\",\n        \"numero\": \"legacy\",\n        \"link\": \"legacy\"\n    },\n    \"address\": {\n        \"street\": \"Rua Buenos Aires\",\n        \"number\": \"334\",\n        \"complement\": \"Loja\",\n        \"city\": \"Rio de Janeiro\",\n        \"state\": \"RJ\",\n        \"zipcode\": \"20061000\",\n        \"neighborhood\": \"Centro\",\n        \"phone\": \"21 21093661\",\n        \"country\": \"BR\"\n    }\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{usa-api-domain}}/api/v3/orders",
+									"host": [
+										"{{usa-api-domain}}"
+									],
+									"path": [
+										"api",
+										"v3",
+										"orders"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Server",
+									"value": "nginx",
+									"uuid": "fb5fd088-eaa6-4b40-95f9-8a5fcac28ff1"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json",
+									"uuid": "8cf0f387-9c05-4f5a-901e-af7f9ebc7ec4"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked",
+									"uuid": "4fb102ac-4d5e-401e-8cc9-7005f59f604d"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive",
+									"uuid": "a46a7bd0-f4ac-4548-a482-a76c7f31fd9c"
+								},
+								{
+									"key": "Vary",
+									"value": "Accept-Encoding",
+									"uuid": "d717addd-580e-4121-b2d5-3231d579cd9f"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, private",
+									"uuid": "b2fff86b-bdc2-4754-844e-7cd526a7438c"
+								},
+								{
+									"key": "Date",
+									"value": "Sat, 20 Jul 2024 03:11:46 GMT",
+									"uuid": "c62292b6-7ff7-416e-953a-dc9d7d978683"
+								},
+								{
+									"key": "X-RateLimit-Limit",
+									"value": "120",
+									"uuid": "bf5d0371-8858-4481-bdab-a1c43d69d575"
+								},
+								{
+									"key": "X-RateLimit-Remaining",
+									"value": "119",
+									"uuid": "c10e164b-4f0e-4861-af8c-8589b21a4610"
+								},
+								{
+									"key": "phpdebugbar-id",
+									"value": "X97baad2108142778d4bd584bc2da6980",
+									"uuid": "6f9abc84-30fa-49da-b5a9-88f31ee9cbfc"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*",
+									"uuid": "039ddf34-df86-401b-b928-66e4cadd8602"
+								},
+								{
+									"key": "X-Frame-Options",
+									"value": "SAMEORIGIN",
+									"uuid": "e1fbe11d-a625-4a15-95ed-aeedd59b83f1"
+								},
+								{
+									"key": "X-XSS-Protection",
+									"value": "1; mode=block",
+									"uuid": "dc8fcd7b-39e7-4fa6-b48f-a7b0fa900d7c"
+								},
+								{
+									"key": "X-Content-Type-Options",
+									"value": "nosniff",
+									"uuid": "2d9514b1-ed5e-4530-bbfe-030e2f43d492"
+								},
+								{
+									"key": "Content-Encoding",
+									"value": "gzip",
+									"uuid": "c1195071-afd1-4658-bc8a-229dd87f381d"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"success\",\n    \"id\": \"your-order-id\",\n    \"reference_id\": \"a2c75b97-21ac-4cfe-9a2d-49a540fa53a5\"\n}"
+						}
+					]
+				}
+			],
+			"id": "d83cf883-e496-4259-9866-7292fec41634"
+		},
+		{
+			"name": "Inventory",
+			"item": [
+				{
+					"name": "Get Stocks",
+					"id": "30781696-05aa-464e-a238-915b8681d72b",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{usa-api-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{usa-api-domain}}/api/v2021/stock?limit=20&offset=50",
+							"host": [
+								"{{usa-api-domain}}"
+							],
+							"path": [
+								"api",
+								"v2021",
+								"stock"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "20"
+								},
+								{
+									"key": "offset",
+									"value": "50"
+								}
+							]
+						},
+						"description": "## 🧾 Get Stocks\n\nRetrieve a **paginated list** of available SKUs, including stock levels, product specs, and print capabilities.\n\nUse this endpoint to **browse** or **sync** your product catalog page by page. It’s optimized for frontend catalog rendering, collection pages, and syncing stock availability for larger datasets.\n\n### 🧾 Query Parameters\n\n| Parameter | Type | Required | Description |\n| --- | --- | --- | --- |\n| `limit` | integer | Optional | Number of items per page (default: 50, max: 100) |\n| `offset` | integer | Optional | Offset index for pagination (e.g., 0, 50, 100) |"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Stock By Reference",
+					"id": "88150a24-b782-4e0c-8fda-19935c410ca2",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{usa-api-domain}}/api/v2021/stock/{{sku-reference}}",
+							"host": [
+								"{{usa-api-domain}}"
+							],
+							"path": [
+								"api",
+								"v2021",
+								"stock",
+								"{{sku-reference}}"
+							]
+						},
+						"description": "## 📦 Get Stock By Reference\n\nReturns **real-time inventory** and product details for a single SKU.\n\nUse this when you know exactly which SKU you want to check.\n\n### ⚠️ Notes\n\n- This is a **single SKU lookup**  \n    If you need to fetch multiple SKUs in one request, use `POST /api/v2021/inventory`"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Inventory",
+					"id": "fcef55a9-5d16-46a3-bdc0-86b9d47c3351",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{usa-api-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"SKU\": [\n    \"BLC-3001-WHITE-XL\",\n    \"BLC-3001-WHITE-L\",\n    \"BLC-3001-WHITE-M\"\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{usa-api-domain}}/api/v2021/inventory",
+							"host": [
+								"{{usa-api-domain}}"
+							],
+							"path": [
+								"api",
+								"v2021",
+								"inventory"
+							]
+						},
+						"description": "## 📥 Get Inventory\n\nBulk-check stock availability for **multiple SKUs at once**.\n\nSend a list of SKU references in the body to receive their current inventory and status."
+					},
+					"response": [
+						{
+							"id": "3097fd94-072a-4190-83d1-cc3295f64028",
+							"name": "Get Inventory",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									},
+									{
+										"key": "Accept",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"SKU\": [\n    \"BLC-3001-WHITE-XL\",\n    \"BLC-3001-WHITE-L\",\n    \"BLC-3001-WHITE-M\"\n  ]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{usa-api-domain}}/api/v2021/inventory",
+									"host": [
+										"{{usa-api-domain}}"
+									],
+									"path": [
+										"api",
+										"v2021",
+										"inventory"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Server",
+									"value": "nginx/1.18.0 (Ubuntu)",
+									"uuid": "5ece3243-be9b-462d-8f1c-44e9bd18e64d"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json",
+									"uuid": "612c1948-60e0-4390-9f60-c91848c53280"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked",
+									"uuid": "cea449a7-6621-4023-b90c-df7756d9af93"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive",
+									"uuid": "3fa1e32d-839c-4f24-be55-d56d068fa1e9"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, private",
+									"uuid": "31856dc9-3176-45de-b27e-2a27801b65b3"
+								},
+								{
+									"key": "Date",
+									"value": "Tue, 22 Mar 2022 22:09:23 GMT",
+									"uuid": "df73bdcd-58a1-43ed-bdf8-8bef8fd3b9e2"
+								},
+								{
+									"key": "X-RateLimit-Limit",
+									"value": "120",
+									"uuid": "efee1e03-a0fe-440a-ba94-6d1f10322dab"
+								},
+								{
+									"key": "X-RateLimit-Remaining",
+									"value": "117",
+									"uuid": "fe2e1683-fc02-4db2-bf4b-2eef572ea9bd"
+								}
+							],
+							"cookie": [
+								{
+									"expires": "Invalid Date"
+								}
+							],
+							"body": "{\n    \"items\": [\n        {\n            \"SKU\": \"BLC-3001-WHITE-L\",\n            \"amount\": 10061,\n            \"status\": \"in-stock\"\n        },\n        {\n            \"SKU\": \"BLC-3001-WHITE-M\",\n            \"amount\": 10062,\n            \"status\": \"in-stock\"\n        },\n        {\n            \"SKU\": \"BLC-3001-WHITE-XL\",\n            \"amount\": 10033,\n            \"status\": \"in-stock\"\n        }\n    ]\n}"
+						}
+					]
+				}
+			],
+			"id": "1505dbba-9d5e-4549-b1b4-b9d22898d26d"
+		},
+		{
+			"name": "Shipping",
+			"item": [
+				{
+					"name": "Calculate Shipping Rates",
+					"id": "63bde535-e45c-461c-91bf-38d7038d30b4",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{usa-api-token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"recipient\": {\n    \"address1\": \"875 Cambridge Drive\",\n    \"city\": \"Elk Grove Village\",\n    \"state_code\": \"IL\",\n    \"country_code\": \"US\",\n    \"zip\": \"60007\",\n    \"phone\": \"1231231234\"\n  },\n  \"items\": [\n    {\n      \"sku\": \"GLD-5000-BLACK-S\",\n      \"quantity\": 2\n    }\n  ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{usa-api-domain}}/api/v2021/shipping/rates",
+							"host": [
+								"{{usa-api-domain}}"
+							],
+							"path": [
+								"api",
+								"v2021",
+								"shipping",
+								"rates"
+							]
+						},
+						"description": "## 🚚 Calculate Shipping Rates\n\nGet real-time shipping rate estimates for a given destination and list of items.\n\nUse this endpoint to display available carriers, service levels, prices, and delivery estimates before placing an order.\n\n### 📦 What It Considers\n\nRates are calculated based on:\n\n- Destination address (ZIP, country, region)\n    \n- Package weight and quantity (derived from the SKUs)\n    \n- Shipping carrier availability by region\n    \n- Priority level: Standard, Priority, Express\n    \n\n### 📌 Response Includes\n\n- `carrier`: e.g., `USPS`, `UPS`, `FedEx`\n    \n- `service_level`: e.g., `Ground Advantage`, `2-Day`, `Overnight`\n    \n- `cost`: calculated shipping charge\n    \n- `estimated_delivery_days`: transit time in business days\n    \n- `rate_id`: unique identifier used when submitting the order\n    \n\n### ⚠️ Tips\n\n- Use the returned `rate_id` when submitting the actual order to lock in the rate\n    \n- Refresh rates if the cart or address changes"
+					},
+					"response": [
+						{
+							"id": "2b1641a5-abb8-4375-b283-fb3d59dcec0d",
+							"name": "Calculate Shipping Rates",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"recipient\": {\n    \"address1\": \"875 Cambridge Drive\",\n    \"city\": \"Elk Grove Village\",\n    \"state_code\": \"IL\",\n    \"country_code\": \"US\",\n    \"zip\": \"60007\",\n    \"phone\": \"1231231234\"\n  },\n  \"items\": [\n    {\n      \"sku\": \"GLD-5000-BLACK-S\",\n      \"quantity\": 2\n    }\n  ]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{usa-api-domain}}/api/v2021/shipping/rates",
+									"host": [
+										"{{usa-api-domain}}"
+									],
+									"path": [
+										"api",
+										"v2021",
+										"shipping",
+										"rates"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Server",
+									"value": "nginx/1.25.4",
+									"uuid": "3567f685-5e0f-417f-ab44-cf7a832cbbdb"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json",
+									"uuid": "f57d2c84-ad22-4edf-a4ed-e18ad719644c"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked",
+									"uuid": "d8fd75cc-7fdc-4211-93b6-8836420b9ba6"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive",
+									"uuid": "213841eb-f084-4d2f-9aef-89d8d8bd061d"
+								},
+								{
+									"key": "Vary",
+									"value": "Accept-Encoding",
+									"uuid": "84c3cd65-15ef-4ade-9ffa-bf50eb057cd0"
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "PHP/8.2.16",
+									"uuid": "41c60de1-f431-461a-99eb-8bc0472769c8"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, private",
+									"uuid": "11ee542e-f99b-43b6-84d9-039443958e78"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 19 Feb 2025 03:53:04 GMT",
+									"uuid": "0c003b1c-90c0-4f07-a5a5-7b2bc9ff1d0b"
+								},
+								{
+									"key": "X-RateLimit-Limit",
+									"value": "120",
+									"uuid": "81240a82-d98f-4c1e-a3f0-f9b7a9c4fae3"
+								},
+								{
+									"key": "X-RateLimit-Remaining",
+									"value": "119",
+									"uuid": "9c1c7474-7e15-410c-8d5b-9082151de194"
+								},
+								{
+									"key": "phpdebugbar-id",
+									"value": "X5cbbbbdd5a7402e9b2b5c0b0bec66f07",
+									"uuid": "efc68210-b1b8-4cc3-ae5b-0d2eca5d15f4"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*",
+									"uuid": "bcd3e979-e713-4742-ae15-a3b7e2929685"
+								},
+								{
+									"key": "Content-Encoding",
+									"value": "gzip",
+									"uuid": "cbcdf406-1dd0-4801-a599-c767cdb1e120"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"code\": 200,\n    \"result\": [\n        {\n            \"id\": \"Priority\",\n            \"name\": \"USPS Priority (Est. delivery: Feb 20)\",\n            \"rate\": \"8.83\",\n            \"currency\": \"USD\",\n            \"minDeliveryDays\": 1,\n            \"maxDeliveryDays\": 3,\n            \"minDeliveryDate\": \"2025-02-19\",\n            \"maxDeliveryDate\": \"2025-02-21\"\n        },\n        {\n            \"id\": \"GroundAdvantage\",\n            \"name\": \"USPS GroundAdvantage (Est. delivery: Feb 21)\",\n            \"rate\": \"5.18\",\n            \"currency\": \"USD\",\n            \"minDeliveryDays\": 2,\n            \"maxDeliveryDays\": 4,\n            \"minDeliveryDate\": \"2025-02-20\",\n            \"maxDeliveryDate\": \"2025-02-22\"\n        },\n        {\n            \"id\": \"Express\",\n            \"name\": \"USPS Express (Est. delivery: Feb 19)\",\n            \"rate\": \"39.94\",\n            \"currency\": \"USD\",\n            \"minDeliveryDays\": 1,\n            \"maxDeliveryDays\": 2,\n            \"minDeliveryDate\": \"2025-02-19\",\n            \"maxDeliveryDate\": \"2025-02-20\"\n        },\n        {\n            \"id\": \"NextDayAir\",\n            \"name\": \"UPSDAP NextDayAir (Est. delivery: Feb 19)\",\n            \"rate\": \"45.89\",\n            \"currency\": \"USD\",\n            \"minDeliveryDays\": 1,\n            \"maxDeliveryDays\": 2,\n            \"minDeliveryDate\": \"2025-02-19\",\n            \"maxDeliveryDate\": \"2025-02-20\"\n        },\n        {\n            \"id\": \"NextDayAirEarlyAM\",\n            \"name\": \"UPSDAP NextDayAirEarlyAM (Est. delivery: Feb 19)\",\n            \"rate\": \"78.89\",\n            \"currency\": \"USD\",\n            \"minDeliveryDays\": 1,\n            \"maxDeliveryDays\": 2,\n            \"minDeliveryDate\": \"2025-02-19\",\n            \"maxDeliveryDate\": \"2025-02-20\"\n        },\n        {\n            \"id\": \"NextDayAirSaver\",\n            \"name\": \"UPSDAP NextDayAirSaver (Est. delivery: Feb 19)\",\n            \"rate\": \"38.68\",\n            \"currency\": \"USD\",\n            \"minDeliveryDays\": 1,\n            \"maxDeliveryDays\": 2,\n            \"minDeliveryDate\": \"2025-02-19\",\n            \"maxDeliveryDate\": \"2025-02-20\"\n        },\n        {\n            \"id\": \"2ndDayAir\",\n            \"name\": \"UPSDAP 2ndDayAir (Est. delivery: Feb 20)\",\n            \"rate\": \"17.47\",\n            \"currency\": \"USD\",\n            \"minDeliveryDays\": 1,\n            \"maxDeliveryDays\": 3,\n            \"minDeliveryDate\": \"2025-02-19\",\n            \"maxDeliveryDate\": \"2025-02-21\"\n        },\n        {\n            \"id\": \"2ndDayAirAM\",\n            \"name\": \"UPSDAP 2ndDayAirAM (Est. delivery: Feb 20)\",\n            \"rate\": \"19.13\",\n            \"currency\": \"USD\",\n            \"minDeliveryDays\": 1,\n            \"maxDeliveryDays\": 3,\n            \"minDeliveryDate\": \"2025-02-19\",\n            \"maxDeliveryDate\": \"2025-02-21\"\n        },\n        {\n            \"id\": \"3DaySelect\",\n            \"name\": \"UPSDAP 3DaySelect (Est. delivery: Feb 21)\",\n            \"rate\": \"12.99\",\n            \"currency\": \"USD\",\n            \"minDeliveryDays\": 2,\n            \"maxDeliveryDays\": 4,\n            \"minDeliveryDate\": \"2025-02-20\",\n            \"maxDeliveryDate\": \"2025-02-22\"\n        },\n        {\n            \"id\": \"Ground\",\n            \"name\": \"UPSDAP Ground (Est. delivery: Feb 21)\",\n            \"rate\": \"9.06\",\n            \"currency\": \"USD\",\n            \"minDeliveryDays\": 2,\n            \"maxDeliveryDays\": 4,\n            \"minDeliveryDate\": \"2025-02-20\",\n            \"maxDeliveryDate\": \"2025-02-22\"\n        },\n        {\n            \"id\": \"FIRST_OVERNIGHT\",\n            \"name\": \"FedEx FIRST_OVERNIGHT (Est. delivery: Feb 19)\",\n            \"rate\": \"162.22\",\n            \"currency\": \"USD\",\n            \"minDeliveryDays\": 1,\n            \"maxDeliveryDays\": 2,\n            \"minDeliveryDate\": \"2025-02-19\",\n            \"maxDeliveryDate\": \"2025-02-20\"\n        },\n        {\n            \"id\": \"PRIORITY_OVERNIGHT\",\n            \"name\": \"FedEx PRIORITY_OVERNIGHT (Est. delivery: Feb 19)\",\n            \"rate\": \"121.98\",\n            \"currency\": \"USD\",\n            \"minDeliveryDays\": 1,\n            \"maxDeliveryDays\": 2,\n            \"minDeliveryDate\": \"2025-02-19\",\n            \"maxDeliveryDate\": \"2025-02-20\"\n        },\n        {\n            \"id\": \"STANDARD_OVERNIGHT\",\n            \"name\": \"FedEx STANDARD_OVERNIGHT (Est. delivery: Feb 19)\",\n            \"rate\": \"109.54\",\n            \"currency\": \"USD\",\n            \"minDeliveryDays\": 1,\n            \"maxDeliveryDays\": 2,\n            \"minDeliveryDate\": \"2025-02-19\",\n            \"maxDeliveryDate\": \"2025-02-20\"\n        },\n        {\n            \"id\": \"FEDEX_2_DAY_AM\",\n            \"name\": \"FedEx FEDEX_2_DAY_AM (Est. delivery: Feb 20)\",\n            \"rate\": \"60.85\",\n            \"currency\": \"USD\",\n            \"minDeliveryDays\": 1,\n            \"maxDeliveryDays\": 3,\n            \"minDeliveryDate\": \"2025-02-19\",\n            \"maxDeliveryDate\": \"2025-02-21\"\n        },\n        {\n            \"id\": \"FEDEX_2_DAY\",\n            \"name\": \"FedEx FEDEX_2_DAY (Est. delivery: Feb 20)\",\n            \"rate\": \"52.43\",\n            \"currency\": \"USD\",\n            \"minDeliveryDays\": 1,\n            \"maxDeliveryDays\": 3,\n            \"minDeliveryDate\": \"2025-02-19\",\n            \"maxDeliveryDate\": \"2025-02-21\"\n        },\n        {\n            \"id\": \"FEDEX_EXPRESS_SAVER\",\n            \"name\": \"FedEx FEDEX_EXPRESS_SAVER (Est. delivery: Feb 23)\",\n            \"rate\": \"44.84\",\n            \"currency\": \"USD\",\n            \"minDeliveryDays\": 4,\n            \"maxDeliveryDays\": 6,\n            \"minDeliveryDate\": \"2025-02-22\",\n            \"maxDeliveryDate\": \"2025-02-24\"\n        },\n        {\n            \"id\": \"FEDEX_GROUND\",\n            \"name\": \"FedEx FEDEX_GROUND (Est. delivery: Feb 21)\",\n            \"rate\": \"17.09\",\n            \"currency\": \"USD\",\n            \"minDeliveryDays\": 2,\n            \"maxDeliveryDays\": 4,\n            \"minDeliveryDate\": \"2025-02-20\",\n            \"maxDeliveryDate\": \"2025-02-22\"\n        }\n    ]\n}"
+						},
+						{
+							"id": "56b4fe66-1bc5-4070-8524-56eafd37e66c",
+							"name": "Calculate Shipping Rates (International Rates)",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									},
+									{
+										"key": "Accept",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"recipient\": {\n    \"address1\": \"Rua Buenos Aires 334\",\n    \"city\": \"Rio de Janeiro\",\n    \"state_code\": \"RJ\",\n    \"country_code\": \"BR\",\n    \"zip\": \"20061001\",\n    \"phone\": \"1231231234\"\n  },\n  \"items\": [\n    {\n      \"sku\": \"GLD-5000-BLACK-S\",\n      \"quantity\": 2\n    }\n  ]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{usa-api-domain}}/api/v2021/shipping/rates",
+									"host": [
+										"{{usa-api-domain}}"
+									],
+									"path": [
+										"api",
+										"v2021",
+										"shipping",
+										"rates"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Server",
+									"value": "nginx/1.25.4",
+									"uuid": "59695282-09ea-4e4c-b482-dfedc80b9021"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json",
+									"uuid": "31720799-3593-45c3-b22b-dcdd14e76dba"
+								},
+								{
+									"key": "Transfer-Encoding",
+									"value": "chunked",
+									"uuid": "95000d08-8a62-4cb1-a365-4a4c951b6f4b"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive",
+									"uuid": "40e94e79-19de-4c96-bf6f-53b7ec380bf8"
+								},
+								{
+									"key": "Vary",
+									"value": "Accept-Encoding",
+									"uuid": "91f7feb4-1982-4f3a-baff-057d78514a5b"
+								},
+								{
+									"key": "X-Powered-By",
+									"value": "PHP/8.2.16",
+									"uuid": "638c5224-700b-4dbb-9216-fb9afdf05db4"
+								},
+								{
+									"key": "Cache-Control",
+									"value": "no-cache, private",
+									"uuid": "2ce8740c-a8e7-4ead-9034-b6581ba9d099"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 19 Feb 2025 03:53:39 GMT",
+									"uuid": "5e91e285-7020-4801-ae6b-8dd78bd35526"
+								},
+								{
+									"key": "X-RateLimit-Limit",
+									"value": "120",
+									"uuid": "7ab3dd0f-a959-4fd3-9afc-54a460092a06"
+								},
+								{
+									"key": "X-RateLimit-Remaining",
+									"value": "118",
+									"uuid": "2363fec6-000b-4b76-b534-90f3588e1bc7"
+								},
+								{
+									"key": "phpdebugbar-id",
+									"value": "X22cff3b5204f07f945a4d0b88fbbd41f",
+									"uuid": "d122f3cf-3085-42e2-9ca4-18b9a954ba8c"
+								},
+								{
+									"key": "Access-Control-Allow-Origin",
+									"value": "*",
+									"uuid": "f2a0aee4-4947-4f10-96a9-aa10aa1b364e"
+								},
+								{
+									"key": "Content-Encoding",
+									"value": "gzip",
+									"uuid": "128f2ebf-0563-45b2-84d9-090a037abca9"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"code\": 200,\n    \"result\": [\n        {\n            \"id\": \"PriorityMailInternational\",\n            \"name\": \"USPS PriorityMailInternational (Est. delivery: Feb 23)\",\n            \"rate\": \"67.08\",\n            \"currency\": \"USD\",\n            \"minDeliveryDays\": 4,\n            \"maxDeliveryDays\": 6,\n            \"minDeliveryDate\": \"2025-02-22\",\n            \"maxDeliveryDate\": \"2025-02-24\"\n        },\n        {\n            \"id\": \"ExpressMailInternational\",\n            \"name\": \"USPS ExpressMailInternational (Est. delivery: Feb 23)\",\n            \"rate\": \"82.92\",\n            \"currency\": \"USD\",\n            \"minDeliveryDays\": 4,\n            \"maxDeliveryDays\": 6,\n            \"minDeliveryDate\": \"2025-02-22\",\n            \"maxDeliveryDate\": \"2025-02-24\"\n        },\n        {\n            \"id\": \"FirstClassPackageInternationalService\",\n            \"name\": \"USPS FirstClassPackageInternationalService (Est. delivery: Feb 23)\",\n            \"rate\": \"25.95\",\n            \"currency\": \"USD\",\n            \"minDeliveryDays\": 4,\n            \"maxDeliveryDays\": 6,\n            \"minDeliveryDate\": \"2025-02-22\",\n            \"maxDeliveryDate\": \"2025-02-24\"\n        },\n        {\n            \"id\": \"FEDEX_INTERNATIONAL_PRIORITY\",\n            \"name\": \"FedEx FEDEX_INTERNATIONAL_PRIORITY (Est. delivery: Feb 20)\",\n            \"rate\": \"260.01\",\n            \"currency\": \"USD\",\n            \"minDeliveryDays\": 1,\n            \"maxDeliveryDays\": 3,\n            \"minDeliveryDate\": \"2025-02-19\",\n            \"maxDeliveryDate\": \"2025-02-21\"\n        },\n        {\n            \"id\": \"INTERNATIONAL_ECONOMY\",\n            \"name\": \"FedEx INTERNATIONAL_ECONOMY (Est. delivery: Feb 24)\",\n            \"rate\": \"250.01\",\n            \"currency\": \"USD\",\n            \"minDeliveryDays\": 5,\n            \"maxDeliveryDays\": 7,\n            \"minDeliveryDate\": \"2025-02-23\",\n            \"maxDeliveryDate\": \"2025-02-25\"\n        },\n        {\n            \"id\": \"FEDEX_INTERNATIONAL_CONNECT_PLUS\",\n            \"name\": \"FedEx FEDEX_INTERNATIONAL_CONNECT_PLUS (Est. delivery: Feb 24)\",\n            \"rate\": \"230.21\",\n            \"currency\": \"USD\",\n            \"minDeliveryDays\": 5,\n            \"maxDeliveryDays\": 7,\n            \"minDeliveryDate\": \"2025-02-23\",\n            \"maxDeliveryDate\": \"2025-02-25\"\n        }\n    ]\n}"
+						}
+					]
+				}
+			],
+			"id": "db8f084c-a340-4e42-8eb9-d41bd3d86255"
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{usa-api-token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "8816bb3c-08b2-4046-923a-3fc3833d4567",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "1c2c4adf-e7b3-42d9-ae98-675e181de05a",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}

@@ -1,0 +1,855 @@
+openapi: 3.0.3
+info:
+  title: Dimona API – Production & Fulfillment
+  description: |
+    Welcome to the Dimona API — your gateway to fast, high-quality direct-to-garment (DTG) printing across the Americas.
+
+    Dimona operates the largest on-demand DTG network in Latin America, with facilities in the U.S., Brazil, Mexico, Argentina, and Chile. Whether you're building an eCommerce store, managing a B2B merch program, or scaling global fulfillment — this API gets your orders printed, packed, and shipped with precision.
+
+    **Key Features:**
+    - 📦 Local production, faster delivery
+    - 🧵 High-quality DTG printing (no minimums)
+    - 🌍 International reach with region-optimized logistics
+
+    Explore the endpoints below to submit orders, check inventory, track production events, and manage your fulfillment workflow.
+  version: "2021"
+  contact:
+    name: Dimona API Support
+    email: api@dimonatee.com
+
+servers:
+  - url: https://api.dimonausa.com
+    description: Production server
+
+security:
+  - bearerAuth: []
+
+paths:
+  /api/v2021/orders:
+    post:
+      tags:
+        - Order
+      summary: Submit a production order
+      description: |
+        ## 🧾 Submit a Production Order
+
+        Create a new DTG production order to be printed, packed, and shipped from one of our regional facilities.
+
+        Use this endpoint to send print-ready artwork, shipping details, and item metadata. Orders are automatically validated, assigned to the best facility, and queued for fulfillment.
+
+        ### 🔧 Required Fields
+        - `id`: Your unique order reference (used for idempotency)
+        - `items`: List of products to print, each with a valid SKU and quantity
+        - `print_files`: High-res artwork for each print location (PNG, 300 DPI, transparent)
+        - `preview_files`: Customer-facing mockups
+        - `address_to`: Shipping details for the end customer
+        - `shipping`: Carrier and shipping priority
+
+        ### ⚠️ Best Practices
+        1. Check inventory for each SKU before submitting
+        2. Use unique order IDs to avoid duplicates
+        3. Validate print files (300 DPI, correct format) to avoid quality issues
+        4. Include customer contact for delivery updates and return handling
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrderRequest'
+      responses:
+        '200':
+          description: Order created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+        '304':
+          description: Duplicated order
+        '400':
+          description: Bad request (invalid SKU, out of stock, etc.)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthenticatedError'
+
+  /api/v2021/orders/{order-uuid}:
+    get:
+      tags:
+        - Order
+      summary: Retrieve a production order
+      description: |
+        ## 📦 Retrieve a Production Order
+
+        Get full details of a submitted production order using its `reference_id`.
+
+        This endpoint returns the order's current status, shipping details, item list and tracking info (if shipped).
+
+        ### 📋 Order Status Values
+        - `Pending`: Order received
+        - `In Production`: Items are currently being printed/manufactured
+        - `Shipped`: Order dispatched with tracking
+        - `Cancelled`: Order was cancelled
+      parameters:
+        - name: order-uuid
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: The order reference ID
+      responses:
+        '200':
+          description: Order details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderDetails'
+
+  /api/v2021/order/{order-uuid}/cancel:
+    post:
+      tags:
+        - Order
+      summary: Cancel Production Order
+      description: |
+        ## ❌ Cancel Production Order
+
+        Cancel an order before it enters production or shipping.
+
+        ### 🕒 When Cancellation Is Allowed
+        - ✅ `Pending`: Always cancellable
+        - ❌ `In Production`, `Shipped`: Not cancellable via API (contact support)
+      parameters:
+        - name: order-uuid
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                items:
+                  type: array
+                  items:
+                    type: string
+                  description: Array of item IDs to cancel (empty array cancels entire order)
+      responses:
+        '200':
+          description: Cancellation processed
+
+  /api/v2021/order/{order-uuid}/events:
+    get:
+      tags:
+        - Order
+      summary: Retrieve Order Events
+      description: |
+        ## 📜 Retrieve Order Events
+
+        Fetch a detailed timeline of all production-related events for a given order.
+
+        Unlike the main order status (which reflects the order as a whole), this endpoint returns **granular item-level actions**, including printing, packaging, and shipping steps — with timestamps and affected item IDs.
+      parameters:
+        - name: order-uuid
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Order events timeline
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderEvents'
+
+  /api/v3/orders:
+    post:
+      tags:
+        - Order
+      summary: Submit a production order - Legacy Payload
+      description: |
+        ## 🗂️ Submit a Production Order – Legacy Payload
+
+        Legacy version of the production order submission endpoint, maintained for backward compatibility with older Brazil-based integrations.
+
+        **⚠️ Deprecation Notice**: This endpoint is deprecated. Please use `/api/v2021/orders` for new integrations.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LegacyOrderRequest'
+      responses:
+        '200':
+          description: Order created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderResponse'
+
+  /api/v2021/stock:
+    get:
+      tags:
+        - Inventory
+      summary: Get Stocks
+      description: |
+        ## 🧾 Get Stocks
+
+        Retrieve a **paginated list** of available SKUs, including stock levels, product specs, and print capabilities.
+
+        Use this endpoint to **browse** or **sync** your product catalog page by page.
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+            maximum: 100
+          description: Number of items per page
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+          description: Offset index for pagination
+      responses:
+        '200':
+          description: List of SKUs with stock information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockList'
+
+  /api/v2021/stock/{sku-reference}:
+    get:
+      tags:
+        - Inventory
+      summary: Get Stock By Reference
+      description: |
+        ## 📦 Get Stock By Reference
+
+        Returns **real-time inventory** and product details for a single SKU.
+      parameters:
+        - name: sku-reference
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The SKU reference
+      responses:
+        '200':
+          description: SKU stock information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockItem'
+
+  /api/v2021/inventory:
+    post:
+      tags:
+        - Inventory
+      summary: Get Inventory
+      description: |
+        ## 📥 Get Inventory
+
+        Bulk-check stock availability for **multiple SKUs at once**.
+
+        Send a list of SKU references in the body to receive their current inventory and status.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                SKU:
+                  type: array
+                  items:
+                    type: string
+                  example: ["BLC-3001-WHITE-XL", "BLC-3001-WHITE-L", "BLC-3001-WHITE-M"]
+      responses:
+        '200':
+          description: Inventory status for requested SKUs
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InventoryResponse'
+
+  /api/v2021/shipping/rates:
+    post:
+      tags:
+        - Shipping
+      summary: Calculate Shipping Rates
+      description: |
+        ## 🚚 Calculate Shipping Rates
+
+        Get real-time shipping rate estimates for a given destination and list of items.
+
+        Use this endpoint to display available carriers, service levels, prices, and delivery estimates before placing an order.
+
+        ### 📦 What It Considers
+        - Destination address (ZIP, country, region)
+        - Package weight and quantity (derived from the SKUs)
+        - Shipping carrier availability by region
+        - Priority level: Standard, Priority, Express
+
+        ### ⚠️ Tips
+        - Use the returned `rate_id` when submitting the actual order to lock in the rate
+        - Refresh rates if the cart or address changes
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShippingRateRequest'
+      responses:
+        '200':
+          description: Available shipping rates
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShippingRateResponse'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    CreateOrderRequest:
+      type: object
+      required:
+        - id
+        - address_to
+        - shipping
+        - items
+      properties:
+        id:
+          type: string
+          description: Your unique order reference (used for idempotency)
+          example: "orderReference1234"
+        sample:
+          type: boolean
+          description: Mark order as a sample or test
+          default: false
+        reprint:
+          type: boolean
+          description: Reprint of a previously failed/damaged order
+          default: false
+        xqc:
+          type: boolean
+          description: Enable extra quality control for high-value orders
+          default: false
+        address_to:
+          $ref: '#/components/schemas/Address'
+        address_from:
+          $ref: '#/components/schemas/AddressFrom'
+        shipping:
+          $ref: '#/components/schemas/ShippingInfo'
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItem'
+        package_inserts:
+          type: array
+          items:
+            type: string
+            format: uri
+          description: Marketing materials (PDFs, 4x6 recommended)
+        packing_slip:
+          type: string
+          format: uri
+          description: Custom PDF packing slip (letter size, optional)
+
+    Address:
+      type: object
+      required:
+        - address1
+        - city
+        - zip
+        - country
+        - region
+        - first_name
+        - last_name
+      properties:
+        address1:
+          type: string
+          example: "1983 Tigertail Blvd"
+        address2:
+          type: string
+          example: ""
+        city:
+          type: string
+          example: "Dania Beach"
+        zip:
+          type: string
+          example: "33004"
+        country:
+          type: string
+          example: "US"
+        region:
+          type: string
+          example: "FL"
+        first_name:
+          type: string
+          example: "John"
+        last_name:
+          type: string
+          example: "Doe"
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+
+    AddressFrom:
+      type: object
+      properties:
+        address1:
+          type: string
+        address2:
+          type: string
+        city:
+          type: string
+        zip:
+          type: string
+        country:
+          type: string
+        region:
+          type: string
+        company:
+          type: string
+
+    ShippingInfo:
+      type: object
+      properties:
+        carrier:
+          type: string
+          enum: ["USPS", "UPS", "FedEx", "Default"]
+          example: "USPS"
+        priority:
+          type: string
+          enum: ["Standard", "Priority", "Express"]
+          example: "Standard"
+
+    OrderItem:
+      type: object
+      required:
+        - id
+        - sku
+        - preview_files
+        - print_files
+        - quantity
+      properties:
+        id:
+          type: string
+          description: Unique item identifier
+          example: "gB0NV05e"
+        sku:
+          type: string
+          description: Product SKU
+          example: "BLC-3001-BLACK-L"
+        preview_files:
+          type: object
+          properties:
+            front:
+              type: string
+              format: uri
+            back:
+              type: string
+              format: uri
+        print_files:
+          type: object
+          properties:
+            front:
+              type: string
+              format: uri
+            back:
+              type: string
+              format: uri
+        quantity:
+          type: integer
+          minimum: 1
+          example: 1
+
+    OrderResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "success"
+        id:
+          type: string
+          example: "orderReference1234"
+        reference_id:
+          type: string
+          format: uuid
+          example: "a4083bf5-8f45-467c-9b98-bd8334928b06"
+
+    OrderDetails:
+      type: object
+      properties:
+        id:
+          type: string
+        reference_id:
+          type: string
+          format: uuid
+        sample:
+          type: boolean
+        reprint:
+          type: boolean
+        xqc:
+          type: boolean
+        status:
+          type: string
+          enum: ["Pending", "In Production", "Shipped", "Cancelled"]
+        address_to:
+          $ref: '#/components/schemas/Address'
+        address_from:
+          $ref: '#/components/schemas/AddressFrom'
+        shipping:
+          $ref: '#/components/schemas/ShippingInfo'
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItem'
+        tracking_url:
+          type: string
+          format: uri
+        tracking_number:
+          type: string
+        carrier:
+          type: string
+
+    OrderEvents:
+      type: object
+      properties:
+        status:
+          type: string
+        events:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderEvent'
+
+    OrderEvent:
+      type: object
+      properties:
+        time:
+          type: string
+          format: date-time
+          description: ISO 8601 timestamp when the event occurred
+        action:
+          type: string
+          enum: ["created", "picked", "printed", "packaged", "shipped"]
+          description: Type of event
+        affected_items:
+          type: array
+          items:
+            type: string
+          description: Array of item IDs affected by this action
+        tracking_number:
+          type: string
+          description: Only present on 'shipped' events
+        tracking_url:
+          type: string
+          format: uri
+          description: Only present on 'shipped' events
+        carrier:
+          type: string
+          description: Only present on 'shipped' events
+
+    LegacyOrderRequest:
+      type: object
+      properties:
+        shipping_speed:
+          type: string
+        delivery_method_id:
+          type: string
+        order_id:
+          type: string
+        customer_name:
+          type: string
+        customer_document:
+          type: string
+        customer_email:
+          type: string
+          format: email
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/LegacyOrderItem'
+        nfe:
+          type: object
+          properties:
+            chave:
+              type: string
+            serie:
+              type: string
+            numero:
+              type: string
+            link:
+              type: string
+        address:
+          $ref: '#/components/schemas/LegacyAddress'
+
+    LegacyOrderItem:
+      type: object
+      properties:
+        name:
+          type: string
+        sku:
+          type: string
+        qty:
+          type: integer
+        dimona_sku_id:
+          type: string
+        designs:
+          type: object
+          properties:
+            front:
+              type: string
+              format: uri
+            back:
+              type: string
+              format: uri
+            left_sleeve:
+              type: string
+              format: uri
+            right_sleeve:
+              type: string
+              format: uri
+            inner_label:
+              type: string
+              format: uri
+            outer_label:
+              type: string
+              format: uri
+        mocks:
+          type: object
+          properties:
+            front:
+              type: string
+              format: uri
+            back:
+              type: string
+              format: uri
+            left_sleeve:
+              type: string
+              format: uri
+            right_sleeve:
+              type: string
+              format: uri
+            inner_label:
+              type: string
+              format: uri
+            outer_label:
+              type: string
+              format: uri
+
+    LegacyAddress:
+      type: object
+      properties:
+        street:
+          type: string
+        number:
+          type: string
+        complement:
+          type: string
+        city:
+          type: string
+        state:
+          type: string
+        zipcode:
+          type: string
+        neighborhood:
+          type: string
+        phone:
+          type: string
+        country:
+          type: string
+
+    StockList:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/StockItem'
+        pagination:
+          type: object
+          properties:
+            limit:
+              type: integer
+            offset:
+              type: integer
+            total:
+              type: integer
+
+    StockItem:
+      type: object
+      properties:
+        SKU:
+          type: string
+          example: "BLC-3001-WHITE-L"
+        amount:
+          type: integer
+          example: 10061
+        status:
+          type: string
+          enum: ["in-stock", "out-of-stock", "low-stock"]
+          example: "in-stock"
+        product_name:
+          type: string
+        brand:
+          type: string
+        color:
+          type: string
+        size:
+          type: string
+        price:
+          type: number
+          format: decimal
+
+    InventoryResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/StockItem'
+
+    ShippingRateRequest:
+      type: object
+      required:
+        - recipient
+        - items
+      properties:
+        recipient:
+          $ref: '#/components/schemas/ShippingAddress'
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ShippingItem'
+
+    ShippingAddress:
+      type: object
+      required:
+        - address1
+        - city
+        - state_code
+        - country_code
+        - zip
+      properties:
+        address1:
+          type: string
+          example: "875 Cambridge Drive"
+        city:
+          type: string
+          example: "Elk Grove Village"
+        state_code:
+          type: string
+          example: "IL"
+        country_code:
+          type: string
+          example: "US"
+        zip:
+          type: string
+          example: "60007"
+        phone:
+          type: string
+          example: "1231231234"
+
+    ShippingItem:
+      type: object
+      required:
+        - sku
+        - quantity
+      properties:
+        sku:
+          type: string
+          example: "GLD-5000-BLACK-S"
+        quantity:
+          type: integer
+          example: 2
+
+    ShippingRateResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 200
+        result:
+          type: array
+          items:
+            $ref: '#/components/schemas/ShippingRate'
+
+    ShippingRate:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "Priority"
+        name:
+          type: string
+          example: "USPS Priority (Est. delivery: Feb 20)"
+        rate:
+          type: string
+          example: "8.83"
+        currency:
+          type: string
+          example: "USD"
+        minDeliveryDays:
+          type: integer
+          example: 1
+        maxDeliveryDays:
+          type: integer
+          example: 3
+        minDeliveryDate:
+          type: string
+          format: date
+          example: "2025-02-19"
+        maxDeliveryDate:
+          type: string
+          format: date
+          example: "2025-02-21"
+
+    ErrorResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "failed"
+        errors:
+          oneOf:
+            - type: array
+              items:
+                type: object
+            - type: object
+
+    UnauthenticatedError:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Unauthenticated."
+
+tags:
+  - name: Order
+    description: Order management operations
+  - name: Inventory
+    description: Stock and inventory operations
+  - name: Shipping
+    description: Shipping and logistics operations
